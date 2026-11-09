@@ -1,19 +1,28 @@
 import React from 'react';
 import { RotateCw, RotateCcw } from 'lucide-react';
+import { useCanvasStore } from '../../store/useCanvasStore';
 
 export type CameraPreset = 'isometric' | 'front' | 'back' | 'left' | 'right' | 'top';
 
 type ViewControlsProps = {
-  isAutoRotating: boolean;
-  onToggleAutoRotate: () => void;
-  onResetCamera: () => void;
+  isAutoRotating?: boolean;
+  onToggleAutoRotate?: () => void;
+  onResetCamera?: () => void;
 };
 
 export const ViewControls: React.FC<ViewControlsProps> = ({
-  isAutoRotating,
-  onToggleAutoRotate,
-  onResetCamera,
+  isAutoRotating: propIsAutoRotating,
+  onToggleAutoRotate: propOnToggleAutoRotate,
+  onResetCamera: propOnResetCamera,
 }) => {
+  const storeIsAutoRotating = useCanvasStore((s) => s.isAutoRotating);
+  const storeToggleAutoRotate = useCanvasStore((s) => s.toggleAutoRotate);
+  const storeResetCamera = useCanvasStore((s) => s.resetCamera);
+
+  const isAutoRotating = propIsAutoRotating ?? storeIsAutoRotating;
+  const onToggleAutoRotate = propOnToggleAutoRotate ?? storeToggleAutoRotate;
+  const onResetCamera = propOnResetCamera ?? storeResetCamera;
+
   return (
     <div className="absolute bottom-5 left-1/2 -translate-x-1/2 z-20 flex items-center gap-1.5 p-1.5 bg-base-100/85 backdrop-blur-md rounded-2xl border border-base-content/10 shadow-xl select-none">
       {/* auto rotate toggle */}

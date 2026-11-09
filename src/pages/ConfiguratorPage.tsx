@@ -1,6 +1,7 @@
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState } from "react";
 import { useConfiguratorStore } from "../store/useConfiguratorStore";
-import { Canvas3D, type Canvas3DRef } from "../components/3d/Canvas3D";
+import { useCanvasStore } from "../store/useCanvasStore";
+import { Canvas3D } from "../components/3d/Canvas3D";
 import { VariantPicker } from "../components/ui/VariantPicker";
 import { ColorPicker } from "../components/ui/ColorPicker";
 import { HardwareSelector } from "../components/ui/HardwareSelector";
@@ -11,7 +12,6 @@ import { ShopifyPayloadModal } from "../components/ui/ShopifyPayloadModal";
 import { ThemeToggle } from "../components/ui/ThemeToggle";
 import { ShopifyService } from "../services/shopifyService";
 import { PDFService } from "../services/pdfService";
-import { TextureAtlasEngine } from "../utils/textureAtlas";
 import type { ShopifyCartPayload } from "../types/configurator";
 import { toast } from "react-hot-toast";
 import confetti from "canvas-confetti";
@@ -24,8 +24,6 @@ type ConfiguratorPageProps = {
 
 export function ConfiguratorPage({ isEmbed = false }: ConfiguratorPageProps) {
   const navigate = useNavigate();
-  const canvas3DRef = useRef<Canvas3DRef>(null);
-  const atlasEngineRef = useRef<TextureAtlasEngine>(new TextureAtlasEngine());
 
   // zustand store selectors
   const {
@@ -59,35 +57,6 @@ export function ConfiguratorPage({ isEmbed = false }: ConfiguratorPageProps) {
     product.sections.find((s) => s.id === activeSectionId) ||
     product.sections[0];
 
-  // texture atlas bake and threed webgl synchronization
-  const bakeDebounceTimerRef = useRef<number | null>(null);
-
-  const triggerTextureBake = useCallback(() => {
-    if (bakeDebounceTimerRef.current) {
-      window.clearTimeout(bakeDebounceTimerRef.current);
-    }
-
-    bakeDebounceTimerRef.current = window.setTimeout(async () => {
-      try {
-        const atlasCanvas = await atlasEngineRef.current.bakeAtlas(
-          product.sections,
-          sections,
-          baseColor,
-        );
-        if (canvas3DRef.current) {
-          canvas3DRef.current.updateFabricTexture(atlasCanvas);
-          canvas3DRef.current.updateBaseColor(baseColor);
-        }
-      } catch (err) {
-        console.error("Failed to bake texture atlas:", err);
-      }
-    }, 40);
-  }, [sections, baseColor, product.sections]);
-
-  useEffect(() => {
-    triggerTextureBake();
-  }, [triggerTextureBake, selectedVariantId]);
-
   // add to cart action
   const handleAddToCart = async () => {
     confetti({
@@ -100,8 +69,10 @@ export function ConfiguratorPage({ isEmbed = false }: ConfiguratorPageProps) {
     const config = getConfiguration();
 
     let thumbnail = "";
-    if (canvas3DRef.current) {
-      thumbnail = await canvas3DRef.current.takeSnapshot("isometric");
+    try {
+      thumbnail = await useCanvasStore.getState().takeSnapshot("isometric");
+    } catch {
+      // keep fallback empty if snapshot fails
     }
 
     const payload = ShopifyService.buildCartPayload(
@@ -118,16 +89,16 @@ export function ConfiguratorPage({ isEmbed = false }: ConfiguratorPageProps) {
 
   // download pdf production summary
   const handleDownloadPDF = async () => {
-    if (!canvas3DRef.current) return;
     setIsGeneratingPDF(true);
     toast.loading("Capturing multi-angle 3D renders & generating proof...", {
       id: "pdf-toast",
     });
 
     try {
-      const isometric = await canvas3DRef.current.takeSnapshot("isometric");
-      const front = await canvas3DRef.current.takeSnapshot("front");
-      const back = await canvas3DRef.current.takeSnapshot("back");
+      const takeSnapshot = useCanvasStore.getState().takeSnapshot;
+      const isometric = await takeSnapshot("isometric");
+      const front = await takeSnapshot("front");
+      const back = await takeSnapshot("back");
 
       const config = getConfiguration();
       const pdfBlob = await PDFService.generateProductionSummary(
@@ -195,12 +166,7 @@ export function ConfiguratorPage({ isEmbed = false }: ConfiguratorPageProps) {
       <div className="flex-1 flex flex-col lg:flex-row overflow-hidden relative">
         {/* threed webgl canvas container */}
         <div className="flex-1 relative bg-base-300/40 overflow-hidden h-1/2 lg:h-full">
-          <Canvas3D
-            ref={canvas3DRef}
-            modelUrl={currentVariant.modelUrl}
-            baseColor={baseColor}
-            activeSectionId={activeSectionId}
-          />
+          <Canvas3D />
         </div>
 
         {/* right customization drawer with daisyui card tabs */}
@@ -245,7 +211,6 @@ export function ConfiguratorPage({ isEmbed = false }: ConfiguratorPageProps) {
                   sectionCustomizations={sections}
                   onSelectSection={(id) => {
                     setActiveSection(id);
-                    canvas3DRef.current?.focusSection(id);
                   }}
                 />
 

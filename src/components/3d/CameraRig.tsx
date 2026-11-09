@@ -1,4 +1,4 @@
-import { useRef, useImperativeHandle, forwardRef, useCallback } from 'react';
+import { useRef, useCallback, useEffect } from 'react';
 import * as THREE from 'three';
 import { useThree, useFrame } from '@react-three/fiber';
 import { PerspectiveCamera, OrbitControls } from '@react-three/drei';
@@ -7,6 +7,8 @@ import type { CameraPreset } from './ViewControls';
 import { TENT_PRODUCT } from '../../config/tentProduct';
 import { useGSAP } from '@gsap/react';
 import gsap from 'gsap';
+import { useCanvasStore } from '../../store/useCanvasStore';
+import { useConfiguratorStore } from '../../store/useConfiguratorStore';
 
 export type CameraRigRef = {
   focusSection: (sectionId: string) => void;
@@ -15,8 +17,8 @@ export type CameraRigRef = {
 };
 
 type CameraRigProps = {
-  isAutoRotating: boolean;
-  autoRotateSpeed: number;
+  isAutoRotating?: boolean;
+  autoRotateSpeed?: number;
 };
 
 // pan limits boundary to keep camera centered around model
@@ -41,12 +43,20 @@ const PRESET_CAMERA_VIEWS: Record<
   top: { position: [0, 4.2, 0.01], target: [0, 1.2, 0] },
 };
 
-export const CameraRig = forwardRef<CameraRigRef, CameraRigProps>(({
-  isAutoRotating,
-  autoRotateSpeed,
-}, ref) => {
+export const CameraRig = ({
+  isAutoRotating: propIsAutoRotating,
+  autoRotateSpeed = 1.5,
+}: CameraRigProps = {}) => {
   const { camera, gl, scene } = useThree();
   const controlsRef = useRef<OrbitControlsImpl | null>(null);
+
+  const storeIsAutoRotating = useCanvasStore((s) => s.isAutoRotating);
+  const setIsAutoRotating = useCanvasStore((s) => s.setIsAutoRotating);
+  const setResetCameraHandler = useCanvasStore((s) => s.setResetCameraHandler);
+  const setSnapshotHandler = useCanvasStore((s) => s.setSnapshotHandler);
+  const activeSectionId = useConfiguratorStore((s) => s.activeSectionId);
+
+  const isAutoRotating = propIsAutoRotating ?? storeIsAutoRotating;
 
   useGSAP();
 
@@ -154,11 +164,19 @@ export const CameraRig = forwardRef<CameraRigRef, CameraRigProps>(({
     return dataUrl;
   }, [camera, gl, scene]);
 
-  useImperativeHandle(ref, () => ({
-    focusSection,
-    setCameraPreset,
-    takeSnapshot,
-  }), [focusSection, setCameraPreset, takeSnapshot]);
+  useEffect(() => {
+    setResetCameraHandler(() => {
+      setCameraPreset('isometric');
+    });
+    setSnapshotHandler(takeSnapshot);
+  }, [setResetCameraHandler, setSnapshotHandler, setCameraPreset, takeSnapshot]);
+
+  useEffect(() => {
+    if (activeSectionId) {
+      setIsAutoRotating(false);
+      focusSection(activeSectionId);
+    }
+  }, [activeSectionId, setIsAutoRotating, focusSection]);
 
   return (
     <>
@@ -179,6 +197,4 @@ export const CameraRig = forwardRef<CameraRigRef, CameraRigProps>(({
       />
     </>
   );
-});
-
-CameraRig.displayName = 'CameraRig';
+};

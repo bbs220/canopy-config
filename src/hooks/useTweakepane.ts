@@ -78,6 +78,11 @@ export function useTweakpane<T extends Record<string, unknown>>(
   const tweakpaneTargetRef = useRef({ ...params });
 
   useEffect(() => {
+    // disable tweakpane in production environment
+    if (import.meta.env.PROD) {
+      return;
+    }
+
     if (!sharedPane) {
       sharedPane = new Pane({ title: "🛠️ Controls" });
       sharedFolders = {};

@@ -27,3 +27,38 @@
       sans-serif;
   }
 }
+
+/* tweakpane overrides (width, positioning, and scroll limits) */
+.tp-dfwv {
+  position: fixed !important;
+  left: 16px !important;
+  right: auto !important;
+  width: 340px !important;
+  max-width: calc(100vw - 32px) !important;
+  z-index: 99 !important;
+  top: 120px !important;
+  max-height: calc(
+    100vh - 136px
+  ) !important; /* constrain to viewport minus navbar and spacing */
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+}
+
+/* scrollbar to match the neon/tron UI */
+.tp-dfwv::-webkit-scrollbar {
+  width: 6px;
+}
+
+.tp-dfwv::-webkit-scrollbar-track {
+  background: rgba(5, 5, 5, 0.8);
+  border-left: 1px solid rgba(0, 243, 255, 0.2);
+}
+
+.tp-dfwv::-webkit-scrollbar-thumb {
+  background: #344448;
+  border-radius: 4px;
+}
+
+.tp-dfwv::-webkit-scrollbar-thumb:hover {
+  background: #546d74;
+}
