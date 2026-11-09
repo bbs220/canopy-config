@@ -1,4 +1,5 @@
 import type { ProductDefinition } from '../types/configurator';
+import { tentPaths } from '../utils/assetPaths';
 
 export const TENT_PRODUCT: ProductDefinition = {
   id: 'custom-canopy-tent',
@@ -10,7 +11,7 @@ export const TENT_PRODUCT: ProductDefinition = {
       id: 'tent-5x5',
       name: "5' x 5' Compact Pop-up",
       description: 'Ideal for ticket booths, vendor stalls, and tight footprint trade shows.',
-      modelUrl: '/models/Tent_5_5.glb',
+      modelUrl: tentPaths.fiveByFive,
       basePrice: 429.0,
       dimensions: {
         width: "5' (1.52m)",
@@ -24,7 +25,7 @@ export const TENT_PRODUCT: ProductDefinition = {
       id: 'tent-6.5x6.5',
       name: "6.5' x 6.5' Mid-Size Commercial",
       description: 'Our most versatile mid-size shelter for outdoor festivals and farmers markets.',
-      modelUrl: '/models/Tent_6_5_6_5.glb',
+      modelUrl: tentPaths.sixByFive,
       basePrice: 499.0,
       dimensions: {
         width: "6.5' (1.98m)",
@@ -38,7 +39,7 @@ export const TENT_PRODUCT: ProductDefinition = {
       id: 'tent-8x8',
       name: "8' x 8' Heavy-Duty Pro",
       description: 'Spacious display footprint with maximum branding visibility and airflow.',
-      modelUrl: '/models/Tent_8_8.glb',
+      modelUrl: tentPaths.eightByEight,
       basePrice: 549.0,
       dimensions: {
         width: "8' (2.44m)",
