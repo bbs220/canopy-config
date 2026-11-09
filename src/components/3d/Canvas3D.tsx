@@ -125,7 +125,6 @@ export const Canvas3D = forwardRef<Canvas3DRef, Canvas3DProps>(({
   activeSectionId,
   className = '',
 }, ref) => {
-  const [currentPreset, setCurrentPreset] = useState<CameraPreset>('isometric');
   const [isAutoRotating, setIsAutoRotating] = useState<boolean>(false);
   const [activeTextureCanvas, setActiveTextureCanvas] = useState<HTMLCanvasElement | null>(null);
   const [activeBaseColor, setActiveBaseColor] = useState<string>(baseColor);
@@ -151,11 +150,9 @@ export const Canvas3D = forwardRef<Canvas3DRef, Canvas3DProps>(({
     cameraRigRef.current?.focusSection(sectionId);
   }, []);
 
-  // Set Camera Preset via CameraRig
-  const setCameraPreset = useCallback((preset: CameraPreset) => {
-    setCurrentPreset(preset);
+  const resetCamera = useCallback(() => {
     setIsAutoRotating(false);
-    cameraRigRef.current?.setCameraPreset(preset);
+    cameraRigRef.current?.setCameraPreset('isometric');
   }, []);
 
   // High-Res WebGL Snapshot
@@ -258,11 +255,9 @@ export const Canvas3D = forwardRef<Canvas3DRef, Canvas3DProps>(({
 
       {/* Viewport Floating Preset Controls */}
       <ViewControls
-        currentPreset={currentPreset}
         isAutoRotating={isAutoRotating}
-        onSelectPreset={setCameraPreset}
         onToggleAutoRotate={() => setIsAutoRotating((prev) => !prev)}
-        onResetView={() => setCameraPreset('isometric')}
+        onResetCamera={resetCamera}
       />
     </div>
   );

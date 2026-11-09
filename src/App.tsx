@@ -2,10 +2,10 @@ import {
   createBrowserRouter,
   RouterProvider,
   Outlet,
-  Navigate,
 } from "react-router";
 import { ConfiguratorPage } from "./pages/ConfiguratorPage";
 import { ShopifyStorePage } from "./pages/ShopifyStorePage";
+import { NotFoundPage } from "./pages/NotFoundPage";
 import { Toaster } from "react-hot-toast";
 
 function RootLayout() {
@@ -35,7 +35,7 @@ const router = createBrowserRouter([
       },
       {
         path: "*",
-        element: <Navigate to="/" replace />,
+        element: <NotFoundPage />,
       },
     ],
   },
