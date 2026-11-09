@@ -195,7 +195,7 @@ export const Canvas3D = forwardRef<Canvas3DRef, Canvas3DProps>(({
           toneMappingExposure: tweakParams.exposure,
         }}
         shadows
-        className="w-full h-full cursor-grab active:cursor-grabbing"
+        className="w-full h-full"
       >
         {/* dynamic theme background color */}
         <color attach="background" args={[bgColor]} />
@@ -248,6 +248,24 @@ export const Canvas3D = forwardRef<Canvas3DRef, Canvas3DProps>(({
           position={[0, -0.005, 0]}
         />
       </Canvas>
+
+      {/* top left stage navigation instructions without background */}
+      <div className="absolute top-4 left-4 z-20 hidden md:flex items-center gap-2 text-[11px] text-base-content/70 select-none drop-shadow-xs pointer-events-none">
+        <div className="flex items-center gap-1">
+          <span className="font-semibold text-base-content/90">L-Click</span>
+          <span>Rotate</span>
+        </div>
+        <span className="opacity-40">•</span>
+        <div className="flex items-center gap-1">
+          <span className="font-semibold text-base-content/90">R-Click</span>
+          <span>Pan</span>
+        </div>
+        <span className="opacity-40">•</span>
+        <div className="flex items-center gap-1">
+          <span className="font-semibold text-base-content/90">Scroll</span>
+          <span>Zoom</span>
+        </div>
+      </div>
 
       {/* stream asset and initialization loader */}
       <ModelLoader />
