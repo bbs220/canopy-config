@@ -12,6 +12,7 @@ import * as THREE from 'three';
 import { Canvas } from '@react-three/fiber';
 import { ContactShadows, useGLTF } from '@react-three/drei';
 import { CameraRig, type CameraRigRef } from './CameraRig';
+import { ModelLoader } from './ModelLoader';
 import { ViewControls, type CameraPreset } from './ViewControls';
 import { useTweakpane } from '../../hooks/useTweakepane';
 import { useThemeStore } from '../../store/useThemeStore';
@@ -30,10 +31,6 @@ interface Canvas3DProps {
   className?: string;
 }
 
-// Preload all 3 size variant GLTF models
-useGLTF.preload('/models/Tent_5_5.glb');
-useGLTF.preload('/models/Tent_6_5_6_5.glb');
-useGLTF.preload('/models/Tent_8_8.glb');
 
 interface ModelProps {
   url: string;
@@ -255,6 +252,9 @@ export const Canvas3D = forwardRef<Canvas3DRef, Canvas3DProps>(({
           position={[0, -0.005, 0]}
         />
       </Canvas>
+
+      {/* Global 3D Asset Stream & Initialization Loader */}
+      <ModelLoader />
 
       {/* Viewport Floating Preset Controls */}
       <ViewControls
