@@ -30,7 +30,7 @@ const PAN_LIMITS = {
 };
 
 // scene center target coordinates
-const SCENE_CENTER: [number, number, number] = [0, -0.2, 0];
+const SCENE_CENTER: [number, number, number] = [0, 0, 0];
 
 export const CameraRig = ({
   isAutoRotating: propIsAutoRotating,
@@ -45,7 +45,7 @@ export const CameraRig = ({
   // live tweakpane parameters partitioned per model variant
   const tweakParams = useTweakpane("3D Studio", {
     fov5x5: {
-      value: 50,
+      value: 60,
       min: 15,
       max: 100,
       step: 1,
@@ -77,7 +77,7 @@ export const CameraRig = ({
       folder: "5x5 Tent",
     },
     targetY5x5: {
-      value: 0.0,
+      value: 0.9,
       min: -2.0,
       max: 3.0,
       step: 0.05,
@@ -93,7 +93,7 @@ export const CameraRig = ({
       folder: "5x5 Tent",
     },
     posY5x5: {
-      value: 2.5,
+      value: 0,
       min: -10.0,
       max: 10.0,
       step: 0.1,
@@ -101,7 +101,7 @@ export const CameraRig = ({
       folder: "5x5 Tent",
     },
     posZ5x5: {
-      value: 3.5,
+      value: 3.0,
       min: -10.0,
       max: 10.0,
       step: 0.1,
@@ -110,7 +110,7 @@ export const CameraRig = ({
     },
 
     fov6x5: {
-      value: 52,
+      value: 60,
       min: 15,
       max: 100,
       step: 1,
@@ -142,7 +142,7 @@ export const CameraRig = ({
       folder: "6.5x6.5 Tent",
     },
     targetY6x5: {
-      value: 0.1,
+      value: 0.9,
       min: -2.0,
       max: 3.0,
       step: 0.05,
@@ -158,7 +158,7 @@ export const CameraRig = ({
       folder: "6.5x6.5 Tent",
     },
     posY6x5: {
-      value: 2.8,
+      value: 0,
       min: -10.0,
       max: 10.0,
       step: 0.1,
@@ -166,7 +166,7 @@ export const CameraRig = ({
       folder: "6.5x6.5 Tent",
     },
     posZ6x5: {
-      value: 4.0,
+      value: 3.0,
       min: -10.0,
       max: 10.0,
       step: 0.1,
@@ -175,7 +175,7 @@ export const CameraRig = ({
     },
 
     fov8x8: {
-      value: 55,
+      value: 60,
       min: 15,
       max: 100,
       step: 1,
@@ -183,7 +183,7 @@ export const CameraRig = ({
       folder: "8x8 Tent",
     },
     zoom8x8: {
-      value: 1.0,
+      value: 0.7,
       min: 0.5,
       max: 3.0,
       step: 0.05,
@@ -207,7 +207,7 @@ export const CameraRig = ({
       folder: "8x8 Tent",
     },
     targetY8x8: {
-      value: 0.2,
+      value: 0.9,
       min: -2.0,
       max: 3.0,
       step: 0.05,
@@ -223,7 +223,7 @@ export const CameraRig = ({
       folder: "8x8 Tent",
     },
     posY8x8: {
-      value: 3.2,
+      value: 0,
       min: -10.0,
       max: 10.0,
       step: 0.1,
@@ -231,7 +231,7 @@ export const CameraRig = ({
       folder: "8x8 Tent",
     },
     posZ8x8: {
-      value: 4.8,
+      value: 3.0,
       min: -10.0,
       max: 10.0,
       step: 0.1,
@@ -358,12 +358,16 @@ export const CameraRig = ({
 
   // sync camera position when active model configuration changes
   useEffect(() => {
-    camera.position.set(activeConfig.posX, activeConfig.posY, activeConfig.posZ);
+    camera.position.set(
+      presetViews.front.position[0],
+      presetViews.front.position[1],
+      presetViews.front.position[2],
+    );
     if (controlsRef.current) {
       controlsRef.current.target.set(0, activeConfig.targetY, 0);
       controlsRef.current.update();
     }
-  }, [camera, activeConfig.posX, activeConfig.posY, activeConfig.posZ, activeConfig.targetY]);
+  }, [camera, presetViews.front.position, activeConfig.targetY]);
 
   // sync projection matrix on fov or zoom changes
   useEffect(() => {
@@ -449,7 +453,7 @@ export const CameraRig = ({
 
   useEffect(() => {
     setResetCameraHandler(() => {
-      setCameraPreset("isometric");
+      setCameraPreset("front");
     });
     setSnapshotHandler(takeSnapshot);
   }, [
@@ -470,7 +474,7 @@ export const CameraRig = ({
     <>
       <PerspectiveCamera
         makeDefault
-        position={[activeConfig.posX, activeConfig.posY, activeConfig.posZ]}
+        position={presetViews.front.position}
         fov={activeConfig.fov}
         zoom={activeConfig.zoom}
       />
