@@ -17,29 +17,28 @@ import { ViewControls, type CameraPreset } from './ViewControls';
 import { useTweakpane } from '../../hooks/useTweakepane';
 import { useThemeStore } from '../../store/useThemeStore';
 
-export interface Canvas3DRef {
+export type Canvas3DRef = {
   takeSnapshot: (angle?: CameraPreset) => Promise<string>;
   focusSection: (sectionId: string) => void;
   updateFabricTexture: (textureCanvas: HTMLCanvasElement) => void;
   updateBaseColor: (hexColor: string) => void;
-}
+};
 
-interface Canvas3DProps {
+type Canvas3DProps = {
   modelUrl: string;
   baseColor?: string;
   activeSectionId?: string;
   className?: string;
-}
+};
 
-
-interface ModelProps {
+type ModelProps = {
   url: string;
   baseColor: string;
   fabricTextureCanvas: HTMLCanvasElement | null;
   roughness: number;
   metalness: number;
   onLoaded?: () => void;
-}
+};
 
 function TentModel({
   url,
@@ -62,7 +61,7 @@ function TentModel({
   const fabricMaterialRef = useRef<THREE.MeshStandardMaterial | null>(null);
   const canvasTextureRef = useRef<THREE.CanvasTexture | null>(null);
 
-  // Setup meshes, shadows, and isolate fabric material
+  // setup meshes shadows and isolate fabric material
   useEffect(() => {
     clonedScene.traverse((child) => {
       if ((child as THREE.Mesh).isMesh) {
@@ -89,7 +88,7 @@ function TentModel({
     onLoaded?.();
   }, [clonedScene, baseColor, roughness, metalness, onLoaded]);
 
-  // Update canvas texture on fabric material
+  // update canvas texture on fabric material
   useEffect(() => {
     if (!fabricTextureCanvas || !fabricMaterialRef.current) return;
 
@@ -108,7 +107,7 @@ function TentModel({
     fabricMaterialRef.current.needsUpdate = true;
   }, [fabricTextureCanvas]);
 
-  // Update base color
+  // update base color
   useEffect(() => {
     if (fabricMaterialRef.current) {
       fabricMaterialRef.current.color.set(baseColor);
@@ -134,7 +133,7 @@ export const Canvas3D = forwardRef<Canvas3DRef, Canvas3DProps>(({
   const theme = useThemeStore((s) => s.theme);
   const bgColor = theme === 'dark' ? '#1d232a' : '#f3f4f6';
 
-  // Tweakpane live controls
+  // tweakpane live controls
   const tweakParams = useTweakpane('3D Studio', {
     exposure: { value: 1.1, min: 0.2, max: 2.5, step: 0.05, folder: 'Environment' },
     ambientIntensity: { value: 1.4, min: 0.1, max: 3.0, step: 0.1, folder: 'Lighting' },
@@ -144,7 +143,7 @@ export const Canvas3D = forwardRef<Canvas3DRef, Canvas3DProps>(({
     autoRotateSpeed: { value: 1.5, min: 0.1, max: 6.0, step: 0.2, folder: 'Camera' },
   });
 
-  // Focus Section via CameraRig
+  // focus section via camera rig
   const focusSection = useCallback((sectionId: string) => {
     setIsAutoRotating(false);
     cameraRigRef.current?.focusSection(sectionId);
@@ -155,22 +154,22 @@ export const Canvas3D = forwardRef<Canvas3DRef, Canvas3DProps>(({
     cameraRigRef.current?.setCameraPreset('isometric');
   }, []);
 
-  // High-Res WebGL Snapshot
+  // high res webgl snapshot
   const takeSnapshot = useCallback(async (preset: CameraPreset = 'isometric'): Promise<string> => {
     return (await cameraRigRef.current?.takeSnapshot(preset)) ?? '';
   }, []);
 
-  // Update canvas texture
+  // update canvas texture
   const updateFabricTexture = useCallback((textureCanvas: HTMLCanvasElement) => {
     setActiveTextureCanvas(textureCanvas);
   }, []);
 
-  // Update base color
+  // update base color
   const updateBaseColor = useCallback((hex: string) => {
     setActiveBaseColor(hex);
   }, []);
 
-  // Expose imperative methods
+  // expose imperative methods
   useImperativeHandle(ref, () => ({
     takeSnapshot,
     focusSection,
@@ -178,7 +177,7 @@ export const Canvas3D = forwardRef<Canvas3DRef, Canvas3DProps>(({
     updateBaseColor,
   }), [takeSnapshot, focusSection, updateFabricTexture, updateBaseColor]);
 
-  // Sync camera when active section changes
+  // sync camera when active section changes
   useEffect(() => {
     if (activeSectionId) {
       cameraRigRef.current?.focusSection(activeSectionId);
@@ -187,7 +186,7 @@ export const Canvas3D = forwardRef<Canvas3DRef, Canvas3DProps>(({
 
   return (
     <div className={`relative w-full h-full select-none overflow-hidden ${className}`}>
-      {/* Declarative R3F Canvas - no camera prop, PerspectiveCamera is mounted inside CameraRig */}
+      {/* declarative rthreef canvas with perspective camera mounted inside camera rig */}
       <Canvas
         gl={{
           antialias: true,
@@ -198,10 +197,10 @@ export const Canvas3D = forwardRef<Canvas3DRef, Canvas3DProps>(({
         shadows
         className="w-full h-full cursor-grab active:cursor-grabbing"
       >
-        {/* Dynamic theme background color */}
+        {/* dynamic theme background color */}
         <color attach="background" args={[bgColor]} />
 
-        {/* Studio Lighting */}
+        {/* studio lighting */}
         <ambientLight intensity={tweakParams.ambientIntensity} />
         <directionalLight
           position={[4, 7, 5]}
@@ -221,14 +220,14 @@ export const Canvas3D = forwardRef<Canvas3DRef, Canvas3DProps>(({
         <directionalLight position={[-5, 4, -4]} intensity={1.0} color="#e0f2fe" />
         <directionalLight position={[0, 6, -5]} intensity={0.8} />
 
-        {/* Encapsulated Camera & OrbitControls Rig with PerspectiveCamera */}
+        {/* encapsulated camera and orbit controls rig with perspective camera */}
         <CameraRig
           ref={cameraRigRef}
           isAutoRotating={isAutoRotating}
           autoRotateSpeed={tweakParams.autoRotateSpeed}
         />
 
-        {/* Tent Model with Suspense */}
+        {/* tent model with suspense */}
         <Suspense fallback={null}>
           <TentModel
             url={modelUrl}
@@ -239,7 +238,7 @@ export const Canvas3D = forwardRef<Canvas3DRef, Canvas3DProps>(({
           />
         </Suspense>
 
-        {/* Photorealistic Drei Contact Shadows */}
+        {/* photorealistic drei contact shadows */}
         <ContactShadows
           opacity={0.55}
           scale={10}
@@ -250,10 +249,10 @@ export const Canvas3D = forwardRef<Canvas3DRef, Canvas3DProps>(({
         />
       </Canvas>
 
-      {/* Global 3D Asset Stream & Initialization Loader */}
+      {/* stream asset and initialization loader */}
       <ModelLoader />
 
-      {/* Viewport Floating Preset Controls */}
+      {/* viewport floating preset controls */}
       <ViewControls
         isAutoRotating={isAutoRotating}
         onToggleAutoRotate={() => setIsAutoRotating((prev) => !prev)}

@@ -17,7 +17,7 @@ export function ShopifyStorePage() {
   const [lastReceivedPayload, setLastReceivedPayload] =
     useState<ShopifyCartPayload | null>(null);
 
-  // Listen for postMessage from the embedded configurator inside the iframe
+  // listen for post message from the embedded configurator inside the iframe
   useEffect(() => {
     const handleMessage = (event: MessageEvent) => {
       if (event.data && event.data.type === "SHOPIFY_ADD_TO_CART") {
@@ -33,7 +33,7 @@ export function ShopifyStorePage() {
 
   return (
     <div className="min-h-screen bg-base-200 font-sans text-base-content flex flex-col">
-      {/* Simulation Banner */}
+      {/* simulation banner */}
       <div className="bg-warning text-warning-content px-4 py-2 text-xs font-bold flex items-center justify-between shadow-xs">
         <div className="flex items-center gap-2">
           <span className="badge badge-neutral badge-xs animate-ping" />
@@ -51,7 +51,7 @@ export function ShopifyStorePage() {
         </button>
       </div>
 
-      {/* Mock Shopify Theme Navigation Header */}
+      {/* mock shopify theme navigation header */}
       <header className="navbar bg-base-100 border-b border-base-300 px-6 py-2 justify-between sticky top-0 z-40 shadow-xs">
         <div className="flex items-center gap-8">
           <div className="font-black text-xl tracking-tight text-base-content flex items-center gap-1.5">
@@ -80,7 +80,7 @@ export function ShopifyStorePage() {
           </nav>
         </div>
 
-        {/* Header Right Actions */}
+        {/* header right actions */}
         <div className="flex items-center gap-3">
           <ThemeToggle />
 
@@ -94,9 +94,9 @@ export function ShopifyStorePage() {
         </div>
       </header>
 
-      {/* Mock Product Details & Embed Section */}
+      {/* mock product details and embed section */}
       <main className="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 space-y-6">
-        {/* Breadcrumb & PDP Title */}
+        {/* breadcrumb and pdp title */}
         <div className="space-y-1">
           <div className="text-xs text-base-content/50">
             Home / Commercial Canopy Tents / Custom 10x10 Series
@@ -115,7 +115,7 @@ export function ShopifyStorePage() {
           </div>
         </div>
 
-        {/* Embedded Iframe Container loading /embed route */}
+        {/* embedded iframe container loading embed route */}
         <div className="bg-base-100 rounded-2xl border border-base-300 shadow-xl overflow-hidden h-187.5 relative">
           <iframe
             src="/embed"
@@ -125,7 +125,7 @@ export function ShopifyStorePage() {
           />
         </div>
 
-        {/* Parent Page Event Log Display */}
+        {/* parent page event log display */}
         {lastReceivedPayload && (
           <div className="alert alert-success text-xs shadow-md">
             <div>
@@ -147,7 +147,7 @@ export function ShopifyStorePage() {
           </div>
         )}
 
-        {/* Trust Badges */}
+        {/* trust badges */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-4 border-t border-base-300 text-xs text-base-content/70">
           <div className="flex items-center gap-2.5 p-3 bg-base-100 rounded-xl border border-base-300 shadow-xs">
             <ShieldCheck className="w-5 h-5 text-primary shrink-0" />

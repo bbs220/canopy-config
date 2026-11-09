@@ -2,13 +2,13 @@ import React, { useState } from 'react';
 import type { PricingBreakdown } from '../../types/configurator';
 import { ShoppingCart, FileDown, ChevronUp, ChevronDown } from 'lucide-react';
 
-interface PriceActionBarProps {
+type PriceActionBarProps = {
   pricing: PricingBreakdown;
   isLoadingPrice?: boolean;
   onAddToCart: () => void;
   onDownloadPDF: () => void;
   isGeneratingPDF?: boolean;
-}
+};
 
 export const PriceActionBar: React.FC<PriceActionBarProps> = ({
   pricing,
@@ -21,7 +21,7 @@ export const PriceActionBar: React.FC<PriceActionBarProps> = ({
 
   return (
     <div className="relative border-t border-base-300 bg-base-100 px-4 py-3 shadow-lg z-30">
-      {/* Itemized Price Breakdown Drawer */}
+      {/* itemized price breakdown drawer */}
       {showBreakdown && (
         <div className="absolute bottom-full left-0 right-0 p-4 bg-base-100 border-t border-base-300 shadow-2xl space-y-2.5 max-h-64 overflow-y-auto animate-in slide-in-from-bottom-2 duration-150">
           <div className="flex items-center justify-between text-xs font-bold text-base-content uppercase tracking-wider">
@@ -53,9 +53,9 @@ export const PriceActionBar: React.FC<PriceActionBarProps> = ({
         </div>
       )}
 
-      {/* Main Bar Actions */}
+      {/* main bar actions */}
       <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3">
-        {/* Dynamic Total & Toggle Button */}
+        {/* dynamic total and toggle button */}
         <div className="flex items-center gap-3 w-full sm:w-auto justify-between sm:justify-start">
           <div>
             <div className="text-[11px] font-medium text-base-content/60 flex items-center gap-1">
@@ -77,14 +77,14 @@ export const PriceActionBar: React.FC<PriceActionBarProps> = ({
             </div>
           </div>
 
-          {/* Quick status badge */}
+          {/* quick status badge */}
           <div className="hidden md:flex items-center gap-2 pl-4 border-l border-base-300 text-[11px] text-base-content/70">
             <span className="badge badge-success badge-xs" />
             <span>2-Day Turnaround • Free Digital Proof</span>
           </div>
         </div>
 
-        {/* Buttons: PDF Export & Add to Cart */}
+        {/* buttons pdf export and add to cart */}
         <div className="flex items-center gap-2.5 w-full sm:w-auto">
           <button
             onClick={onDownloadPDF}

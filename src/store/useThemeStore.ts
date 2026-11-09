@@ -3,11 +3,11 @@ import { persist } from 'zustand/middleware';
 
 export type DaisyTheme = 'light' | 'dark';
 
-interface ThemeState {
+type ThemeState = {
   theme: DaisyTheme;
   setTheme: (theme: DaisyTheme) => void;
   toggleTheme: () => void;
-}
+};
 
 export const useThemeStore = create<ThemeState>()(
   persist(

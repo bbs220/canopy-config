@@ -2,12 +2,12 @@ import React from 'react';
 import type { PrintableSection, SectionCustomization } from '../../types/configurator';
 import { CheckCircle2 } from 'lucide-react';
 
-interface SectionTabsProps {
+type SectionTabsProps = {
   sections: PrintableSection[];
   activeSectionId: string;
   sectionCustomizations: Record<string, SectionCustomization>;
   onSelectSection: (sectionId: string) => void;
-}
+};
 
 export const SectionTabs: React.FC<SectionTabsProps> = ({
   sections,
@@ -26,7 +26,7 @@ export const SectionTabs: React.FC<SectionTabsProps> = ({
         </label>
       </div>
 
-      {/* Peaks (Sloped Roof) */}
+      {/* peaks sloped roof */}
       <div className="space-y-1">
         <div className="text-[11px] font-semibold text-base-content/60">
           Roof Peaks (Long-Range Visibility)
@@ -62,7 +62,7 @@ export const SectionTabs: React.FC<SectionTabsProps> = ({
         </div>
       </div>
 
-      {/* Valances (Eye-Level Perimeter Skirts) */}
+      {/* valances eye level perimeter skirts */}
       <div className="space-y-1 pt-1">
         <div className="text-[11px] font-semibold text-base-content/60">
           Valance Skirts (Eye-Level Brand / URL)

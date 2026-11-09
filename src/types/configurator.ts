@@ -1,29 +1,30 @@
 export type SectionCategory = 'peak' | 'valance' | 'wall';
 
-export interface UVRegion {
+export type UVRegion = {
   uMin: number;
   uMax: number;
   vMin: number;
   vMax: number;
-}
+};
 
-export interface CameraViewConfig {
+export type CameraViewConfig = {
   position: [number, number, number];
   target: [number, number, number];
-}
+};
 
-export interface PrintableSection {
+export type PrintableSection = {
   id: string;
   name: string;
   shortName: string;
   category: SectionCategory;
   uvRegion: UVRegion;
-  aspectRatio: number; // width / height for 2D editor canvas
+  // width divided by height for twod editor canvas
+  aspectRatio: number;
   cameraView: CameraViewConfig;
   printCost: number;
-}
+};
 
-export interface ProductVariant {
+export type ProductVariant = {
   id: string;
   name: string;
   description: string;
@@ -36,24 +37,24 @@ export interface ProductVariant {
     coverageSqFt: number;
   };
   weightLbs: number;
-}
+};
 
-export interface HardwareOption {
+export type HardwareOption = {
   id: string;
   name: string;
   description: string;
   price: number;
   category: 'frame' | 'accessory';
   defaultSelected?: boolean;
-}
+};
 
-export interface ColorOption {
+export type ColorOption = {
   name: string;
   hex: string;
   pantone?: string;
-}
+};
 
-export interface ProductDefinition {
+export type ProductDefinition = {
   id: string;
   name: string;
   tagline: string;
@@ -62,21 +63,23 @@ export interface ProductDefinition {
   availableColors: ColorOption[];
   hardwareOptions: HardwareOption[];
   sections: PrintableSection[];
-}
+};
 
 export type LayerType = 'text' | 'image';
 
-export interface BaseLayer {
+export type BaseLayer = {
   id: string;
   type: LayerType;
-  x: number; // Center percentage (0-100) or pixel
+  // center percentage zero to one hundred or pixel
+  x: number;
   y: number;
   scale: number;
-  rotation: number; // Degrees
+  // degrees
+  rotation: number;
   opacity: number;
-}
+};
 
-export interface TextLayer extends BaseLayer {
+export type TextLayer = BaseLayer & {
   type: 'text';
   text: string;
   fontFamily: string;
@@ -85,31 +88,31 @@ export interface TextLayer extends BaseLayer {
   isBold?: boolean;
   isItalic?: boolean;
   align?: 'left' | 'center' | 'right';
-}
+};
 
-export interface ImageLayer extends BaseLayer {
+export type ImageLayer = BaseLayer & {
   type: 'image';
   src: string;
   fileName: string;
   aspectRatio: number;
-}
+};
 
 export type CustomizationLayer = TextLayer | ImageLayer;
 
-export interface SectionCustomization {
+export type SectionCustomization = {
   backgroundColor?: string;
   layers: CustomizationLayer[];
-}
+};
 
-export interface CustomerConfiguration {
+export type CustomerConfiguration = {
   productId: string;
   variantId: string;
   baseColor: string;
   selectedHardwareIds: string[];
   sections: Record<string, SectionCustomization>;
-}
+};
 
-export interface PricingBreakdown {
+export type PricingBreakdown = {
   variantBasePrice: number;
   hardwareAddonsTotal: number;
   customPrintSectionsTotal: number;
@@ -121,9 +124,9 @@ export interface PricingBreakdown {
     label: string;
     amount: number;
   }[];
-}
+};
 
-export interface ShopifyLineItemProperties {
+export type ShopifyLineItemProperties = {
   _config_id: string;
   _pdf_summary_url?: string;
   _preview_thumbnail?: string;
@@ -133,12 +136,12 @@ export interface ShopifyLineItemProperties {
   'Accessories Included': string;
   'Custom Print Sections': string;
   [key: string]: string | undefined;
-}
+};
 
-export interface ShopifyCartPayload {
+export type ShopifyCartPayload = {
   items: {
     id: number;
     quantity: number;
     properties: ShopifyLineItemProperties;
   }[];
-}
+};

@@ -7,16 +7,16 @@ import { TENT_PRODUCT } from '../../config/tentProduct';
 import { useGSAP } from '@gsap/react';
 import gsap from 'gsap';
 
-export interface CameraRigRef {
+export type CameraRigRef = {
   focusSection: (sectionId: string) => void;
   setCameraPreset: (preset: CameraPreset) => void;
   takeSnapshot: (preset?: CameraPreset) => Promise<string>;
-}
+};
 
-interface CameraRigProps {
+type CameraRigProps = {
   isAutoRotating: boolean;
   autoRotateSpeed: number;
-}
+};
 
 const PRESET_CAMERA_VIEWS: Record<
   CameraPreset,

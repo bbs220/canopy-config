@@ -2,15 +2,15 @@ import React, { useState, useEffect } from 'react';
 import { ShoppingBag, Star, ShieldCheck, Truck, ArrowLeft, RefreshCw } from 'lucide-react';
 import type { ShopifyCartPayload } from '../../types/configurator';
 
-interface ShopifyHostMockProps {
+type ShopifyHostMockProps = {
   onExitIframeMode: () => void;
-}
+};
 
 export const ShopifyHostMock: React.FC<ShopifyHostMockProps> = ({ onExitIframeMode }) => {
   const [cartCount, setCartCount] = useState<number>(0);
   const [lastReceivedPayload, setLastReceivedPayload] = useState<ShopifyCartPayload | null>(null);
 
-  // Listen for postMessage from the embedded configurator inside the iframe
+  // listen for post message from the embedded configurator inside the iframe
   useEffect(() => {
     const handleMessage = (event: MessageEvent) => {
       if (event.data && event.data.type === 'SHOPIFY_ADD_TO_CART') {
@@ -26,7 +26,7 @@ export const ShopifyHostMock: React.FC<ShopifyHostMockProps> = ({ onExitIframeMo
 
   return (
     <div className="min-h-screen bg-zinc-100 dark:bg-zinc-950 font-sans text-zinc-900 dark:text-zinc-100 flex flex-col">
-      {/* Simulation Banner */}
+      {/* simulation banner */}
       <div className="bg-amber-500 text-zinc-950 px-4 py-2 text-xs font-bold flex items-center justify-between shadow-sm">
         <div className="flex items-center gap-2">
           <span className="w-2 h-2 rounded-full bg-zinc-950 animate-ping" />
@@ -41,7 +41,7 @@ export const ShopifyHostMock: React.FC<ShopifyHostMockProps> = ({ onExitIframeMo
         </button>
       </div>
 
-      {/* Mock Shopify Theme Navigation Header */}
+      {/* mock shopify theme navigation header */}
       <header className="bg-white dark:bg-zinc-900 border-b border-zinc-200 dark:border-zinc-800 px-6 py-4 flex items-center justify-between sticky top-0 z-40">
         <div className="flex items-center gap-8">
           <div className="font-black text-xl tracking-tight text-zinc-900 dark:text-white flex items-center gap-1.5">
@@ -58,7 +58,7 @@ export const ShopifyHostMock: React.FC<ShopifyHostMockProps> = ({ onExitIframeMo
           </nav>
         </div>
 
-        {/* Shopify Cart Pill */}
+        {/* shopify cart pill */}
         <div className="flex items-center gap-3">
           <div className="relative flex items-center gap-2 px-3 py-1.5 bg-zinc-100 dark:bg-zinc-800 rounded-full text-xs font-semibold">
             <ShoppingBag className="w-4 h-4 text-blue-600" />
@@ -70,9 +70,9 @@ export const ShopifyHostMock: React.FC<ShopifyHostMockProps> = ({ onExitIframeMo
         </div>
       </header>
 
-      {/* Mock Product Details & Embed Section */}
+      {/* mock product details and embed section */}
       <main className="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 space-y-6">
-        {/* Breadcrumb & PDP Title */}
+        {/* breadcrumb and pdp title */}
         <div className="space-y-1">
           <div className="text-xs text-zinc-400">Home / Commercial Canopy Tents / Custom 10x10 Series</div>
           <h1 className="text-2xl sm:text-3xl font-extrabold text-zinc-900 dark:text-white">
@@ -89,7 +89,7 @@ export const ShopifyHostMock: React.FC<ShopifyHostMockProps> = ({ onExitIframeMo
           </div>
         </div>
 
-        {/* Embedded Iframe Container */}
+        {/* embedded iframe container */}
         <div className="bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200 dark:border-zinc-800 shadow-xl overflow-hidden h-[750px] relative">
           <iframe
             src={window.location.origin}
@@ -99,7 +99,7 @@ export const ShopifyHostMock: React.FC<ShopifyHostMockProps> = ({ onExitIframeMo
           />
         </div>
 
-        {/* Parent Page Event Log Display */}
+        {/* parent page event log display */}
         {lastReceivedPayload && (
           <div className="p-4 bg-emerald-50 dark:bg-emerald-950/40 rounded-xl border border-emerald-200 dark:border-emerald-800 text-xs space-y-2 animate-in fade-in">
             <div className="font-bold text-emerald-800 dark:text-emerald-300 flex items-center gap-1.5">
@@ -112,7 +112,7 @@ export const ShopifyHostMock: React.FC<ShopifyHostMockProps> = ({ onExitIframeMo
           </div>
         )}
 
-        {/* Trust Badges */}
+        {/* trust badges */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-4 border-t border-zinc-200 dark:border-zinc-800 text-xs text-zinc-600 dark:text-zinc-400">
           <div className="flex items-center gap-2.5 p-3 bg-white dark:bg-zinc-900 rounded-xl border border-zinc-200 dark:border-zinc-800">
             <ShieldCheck className="w-5 h-5 text-blue-600 shrink-0" />

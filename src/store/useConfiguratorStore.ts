@@ -8,7 +8,7 @@ import type {
 import { TENT_PRODUCT } from '../config/tentProduct';
 import { PricingService } from '../services/pricingService';
 
-interface ConfiguratorState {
+type ConfiguratorState = {
   product: ProductDefinition;
   selectedVariantId: string;
   baseColor: string;
@@ -18,7 +18,7 @@ interface ConfiguratorState {
   pricing: PricingBreakdown;
   isLoadingPrice: boolean;
 
-  // Actions
+  // actions
   setVariant: (variantId: string) => void;
   setBaseColor: (hex: string) => void;
   toggleHardware: (hardwareId: string) => void;
@@ -28,7 +28,7 @@ interface ConfiguratorState {
   resetAll: () => void;
   calculatePricing: () => Promise<void>;
   getConfiguration: () => CustomerConfiguration;
-}
+};
 
 const INITIAL_PRICING: PricingBreakdown = {
   variantBasePrice: 429.0,
@@ -69,7 +69,7 @@ export const useConfiguratorStore = create<ConfiguratorState>((set, get) => ({
     if (!option) return;
 
     if (option.category === 'frame') {
-      // Single select for frame tier
+      // single select for frame tier
       set({
         selectedHardwareIds: [
           ...selectedHardwareIds.filter((item) => {
@@ -80,7 +80,7 @@ export const useConfiguratorStore = create<ConfiguratorState>((set, get) => ({
         ],
       });
     } else {
-      // Multi-select for accessories
+      // multi select for accessories
       set({
         selectedHardwareIds: selectedHardwareIds.includes(hardwareId)
           ? selectedHardwareIds.filter((item) => item !== hardwareId)

@@ -2,11 +2,11 @@ import React from 'react';
 import type { ProductVariant } from '../../types/configurator';
 import { Check, ShieldCheck, Ruler, Weight } from 'lucide-react';
 
-interface VariantPickerProps {
+type VariantPickerProps = {
   variants: ProductVariant[];
   selectedVariantId: string;
   onSelectVariant: (variantId: string) => void;
-}
+};
 
 export const VariantPicker: React.FC<VariantPickerProps> = ({
   variants,

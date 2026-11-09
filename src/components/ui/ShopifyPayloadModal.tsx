@@ -3,11 +3,11 @@ import type { ShopifyCartPayload } from '../../types/configurator';
 import { CheckCircle, Copy, X, Code2 } from 'lucide-react';
 import toast from 'react-hot-toast';
 
-interface ShopifyPayloadModalProps {
+type ShopifyPayloadModalProps = {
   isOpen: boolean;
   onClose: () => void;
   payload: ShopifyCartPayload | null;
-}
+};
 
 export const ShopifyPayloadModal: React.FC<ShopifyPayloadModalProps> = ({
   isOpen,
@@ -26,7 +26,7 @@ export const ShopifyPayloadModal: React.FC<ShopifyPayloadModalProps> = ({
   return (
     <div className="modal modal-open z-50">
       <div className="modal-box max-w-2xl bg-base-100 border border-base-300 shadow-2xl p-0 overflow-hidden flex flex-col max-h-[90vh]">
-        {/* Header */}
+        {/* header */}
         <div className="flex items-center justify-between p-4 border-b border-base-200 bg-base-200/40">
           <div className="flex items-center gap-2.5">
             <div className="w-8 h-8 rounded-full bg-success/20 text-success flex items-center justify-center">
@@ -50,7 +50,7 @@ export const ShopifyPayloadModal: React.FC<ShopifyPayloadModalProps> = ({
           </button>
         </div>
 
-        {/* Payload Preview */}
+        {/* payload preview */}
         <div className="p-4 space-y-3 overflow-y-auto flex-1">
           <div className="flex items-center justify-between text-xs font-bold text-base-content/70">
             <div className="flex items-center gap-1.5">
@@ -80,7 +80,7 @@ export const ShopifyPayloadModal: React.FC<ShopifyPayloadModalProps> = ({
           </div>
         </div>
 
-        {/* Footer */}
+        {/* footer */}
         <div className="modal-action p-3 border-t border-base-200 bg-base-200/20 m-0 justify-end">
           <button
             onClick={onClose}

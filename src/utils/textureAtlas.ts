@@ -2,9 +2,7 @@ import type { CustomizationLayer, SectionCustomization, PrintableSection } from 
 
 export const MASTER_TEXTURE_SIZE = 2048;
 
-/**
- * Manages the offscreen master 2048x2048 canvas atlas that is bound to Three.js CanvasTexture.
- */
+// manages the offscreen master canvas atlas that is bound to threejs canvas texture
 export class TextureAtlasEngine {
   private masterCanvas: HTMLCanvasElement;
   private ctx: CanvasRenderingContext2D;
@@ -18,7 +16,7 @@ export class TextureAtlasEngine {
     if (!context) throw new Error('Failed to create master canvas 2d context');
     this.ctx = context;
 
-    // Fill with default white
+    // fill with default white
     this.ctx.fillStyle = '#FFFFFF';
     this.ctx.fillRect(0, 0, MASTER_TEXTURE_SIZE, MASTER_TEXTURE_SIZE);
   }
@@ -27,9 +25,7 @@ export class TextureAtlasEngine {
     return this.masterCanvas;
   }
 
-  /**
-   * Pre-loads an image source so it can be drawn synchronously during render
-   */
+  // preloads an image source so it can be drawn synchronously during render
   public async preloadImage(src: string): Promise<HTMLImageElement> {
     if (this.loadedImages.has(src)) {
       return this.loadedImages.get(src)!;
@@ -47,9 +43,7 @@ export class TextureAtlasEngine {
     });
   }
 
-  /**
-   * Renders layers for a single section onto an isolated virtual canvas (1024x1024)
-   */
+  // renders layers for a single section onto an isolated virtual canvas
   public renderSectionToCanvas(
     customization: SectionCustomization,
     baseColor: string,
@@ -62,11 +56,11 @@ export class TextureAtlasEngine {
     const ctx = canvas.getContext('2d');
     if (!ctx) return canvas;
 
-    // Background color
+    // background color
     ctx.fillStyle = customization.backgroundColor || baseColor;
     ctx.fillRect(0, 0, width, height);
 
-    // Draw layers from bottom to top
+    // draw layers from bottom to top
     for (const layer of customization.layers) {
       this.drawLayer(ctx, layer, width, height);
     }
@@ -74,9 +68,7 @@ export class TextureAtlasEngine {
     return canvas;
   }
 
-  /**
-   * Draws a single vector/raster layer
-   */
+  // draws a single vector or raster layer
   public drawLayer(
     ctx: CanvasRenderingContext2D,
     layer: CustomizationLayer,
@@ -85,7 +77,7 @@ export class TextureAtlasEngine {
   ) {
     ctx.save();
 
-    // Map percentage position (0-100) to canvas coordinates
+    // map percentage position to canvas coordinates
     const posX = (layer.x / 100) * canvasWidth;
     const posY = (layer.y / 100) * canvasHeight;
 
@@ -105,7 +97,7 @@ export class TextureAtlasEngine {
     } else if (layer.type === 'image') {
       const img = this.loadedImages.get(layer.src);
       if (img && img.complete) {
-        // Base image width based on scale
+        // base image width based on scale
         const baseWidth = (canvasWidth * 0.4) * layer.scale;
         const baseHeight = baseWidth / (layer.aspectRatio || 1);
         ctx.drawImage(img, -baseWidth / 2, -baseHeight / 2, baseWidth, baseHeight);
@@ -115,9 +107,7 @@ export class TextureAtlasEngine {
     ctx.restore();
   }
 
-  /**
-   * Bakes all sections into the master 2048x2048 UV texture atlas
-   */
+  // bakes all sections into the master uv texture atlas
   public async bakeAtlas(
     sections: PrintableSection[],
     sectionCustomizations: Record<string, SectionCustomization>,
@@ -125,11 +115,11 @@ export class TextureAtlasEngine {
   ): Promise<HTMLCanvasElement> {
     const ctx = this.ctx;
 
-    // Fill entire base canopy fabric
+    // fill entire base canopy fabric
     ctx.fillStyle = baseColor;
     ctx.fillRect(0, 0, MASTER_TEXTURE_SIZE, MASTER_TEXTURE_SIZE);
 
-    // Preload any pending image layers first
+    // preload any pending image layers first
     for (const data of Object.values(sectionCustomizations)) {
       if (data.layers) {
         for (const layer of data.layers) {
@@ -144,7 +134,7 @@ export class TextureAtlasEngine {
       }
     }
 
-    // Project each customized section onto its UV bounds
+    // project each customized section onto its uv bounds
     for (const section of sections) {
       const customData = sectionCustomizations[section.id];
       const hasLayers = customData && customData.layers && customData.layers.length > 0;
@@ -155,18 +145,18 @@ export class TextureAtlasEngine {
 
       const { uMin, uMax, vMin, vMax } = section.uvRegion;
 
-      // In Three.js with flipY=false, canvas coords match UV:
-      // X = u * width
-      // Y = v * height
+      // in threejs with flip y false canvas coords match uv
+      // x equals u times width
+      // y equals v times height
       const targetX = uMin * MASTER_TEXTURE_SIZE;
       const targetY = vMin * MASTER_TEXTURE_SIZE;
       const targetW = (uMax - uMin) * MASTER_TEXTURE_SIZE;
       const targetH = (vMax - vMin) * MASTER_TEXTURE_SIZE;
 
-      // Render section to a virtual high-res buffer
+      // render section to a virtual high res buffer
       const sectionCanvas = this.renderSectionToCanvas(customData, baseColor, 1024, 1024);
 
-      // Blit section canvas into atlas
+      // blit section canvas into atlas
       ctx.drawImage(sectionCanvas, targetX, targetY, targetW, targetH);
     }
 

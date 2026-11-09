@@ -2,11 +2,11 @@ import React from 'react';
 import type { ColorOption } from '../../types/configurator';
 import { Check, Pipette } from 'lucide-react';
 
-interface ColorPickerProps {
+type ColorPickerProps = {
   colors: ColorOption[];
   selectedColor: string;
   onSelectColor: (hex: string) => void;
-}
+};
 
 export const ColorPicker: React.FC<ColorPickerProps> = ({
   colors,
@@ -60,7 +60,7 @@ export const ColorPicker: React.FC<ColorPickerProps> = ({
           );
         })}
 
-        {/* Custom Hex Color Picker Input */}
+        {/* custom hex color picker input */}
         <label
           className="relative flex items-center justify-center w-8 h-8 rounded-full border border-dashed border-zinc-300 dark:border-zinc-700 hover:border-zinc-500 cursor-pointer bg-zinc-50 dark:bg-zinc-800 transition-colors"
           title="Pick Custom HEX Color"

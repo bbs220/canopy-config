@@ -2,24 +2,24 @@ import { useEffect, useState } from 'react';
 import { useProgress, useGLTF } from '@react-three/drei';
 import { tentPaths } from '../../utils/assetPaths';
 
-export interface ModelLoaderProps {
+export type ModelLoaderProps = {
   title?: string;
-}
+};
 
 export const ModelLoader = ({ title = 'INITIALIZING 3D ENVIRONMENT...' }: ModelLoaderProps) => {
   const { progress, active } = useProgress();
 
-  // Decouple visibility from fading to ensure we cover the 3D canvas setup
+  // decouple visibility from fading to ensure we cover the threed canvas setup
   const [visible, setVisible] = useState<boolean>(true);
   const [isFading, setIsFading] = useState<boolean>(false);
 
   useEffect(() => {
-    // Only trigger the exit sequence when all assets are fully loaded
+    // only trigger the exit sequence when all assets are fully loaded
     if (!active && progress === 100) {
-      // 1.2s grace period before starting fade-out
+      // grace period before starting fade out
       const fadeTimer = setTimeout(() => setIsFading(true), 1200);
 
-      // Unmount the component entirely after the 700ms CSS transition finishes
+      // unmount the component entirely after the css transition finishes
       const unmountTimer = setTimeout(() => setVisible(false), 1200 + 700);
 
       return () => {
@@ -29,7 +29,7 @@ export const ModelLoader = ({ title = 'INITIALIZING 3D ENVIRONMENT...' }: ModelL
     }
   }, [active, progress]);
 
-  // Remove from DOM entirely once fade is complete
+  // remove from dom entirely once fade is complete
   if (!visible) return null;
 
   return (
@@ -51,7 +51,7 @@ export const ModelLoader = ({ title = 'INITIALIZING 3D ENVIRONMENT...' }: ModelL
           {title}
         </div>
 
-        {/* Progress Track */}
+        {/* progress track */}
         <div className="h-2 w-full rounded-full bg-base-300 overflow-hidden relative">
           <div
             className="h-full bg-primary rounded-full transition-all duration-300 ease-out"
@@ -59,7 +59,7 @@ export const ModelLoader = ({ title = 'INITIALIZING 3D ENVIRONMENT...' }: ModelL
           />
         </div>
 
-        {/* Status Indicators */}
+        {/* status indicators */}
         <div className="mt-3 flex w-full justify-between items-center text-[11px] font-mono text-base-content/60">
           <span className="font-semibold">
             {progress >= 100 ? 'FINALIZING TEXTURES' : 'STREAMING ASSETS'}
@@ -73,7 +73,7 @@ export const ModelLoader = ({ title = 'INITIALIZING 3D ENVIRONMENT...' }: ModelL
 
 export default ModelLoader;
 
-// Preload all 3 size variant GLTF models
+// preload all three size variant gltf models
 useGLTF.preload(tentPaths.fiveByFive);
 useGLTF.preload(tentPaths.sixByFive);
 useGLTF.preload(tentPaths.eightByEight);

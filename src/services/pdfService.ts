@@ -2,14 +2,12 @@ import { jsPDF } from 'jspdf';
 import type { CustomerConfiguration, PricingBreakdown, ProductDefinition } from '../types/configurator';
 
 export class PDFService {
-  /**
-   * Compiles a high-resolution production PDF spec sheet containing:
-   * 1. Order details & Shopify reference
-   * 2. 3D WebGL render snapshots
-   * 3. 2D print layouts & typography specifications
-   * 4. Bill of Materials (BOM) & pricing breakdown
-   * 5. Factory production approval sign-off
-   */
+  // compiles a high resolution production pdf spec sheet containing
+  // order details and shopify reference
+  // threed webgl render snapshots
+  // twod print layouts and typography specifications
+  // bill of materials and pricing breakdown
+  // factory production approval sign off
   static async generateProductionSummary(
     config: CustomerConfiguration,
     product: ProductDefinition,
@@ -32,8 +30,9 @@ export class PDFService {
       day: 'numeric',
     });
 
-    // 1. Header Bar
-    doc.setFillColor(15, 23, 42); // slate-900
+    // header bar
+    // slate color
+    doc.setFillColor(15, 23, 42);
     doc.rect(0, 0, 210, 24, 'F');
 
     doc.setTextColor(255, 255, 255);
@@ -46,7 +45,7 @@ export class PDFService {
     doc.text(`DATE: ${dateStr}`, 165, 11);
     doc.text(`REF ID: ${orderId}`, 165, 17);
 
-    // 2. Order Metadata Box
+    // order metadata box
     let currentY = 32;
     doc.setTextColor(30, 41, 59);
     doc.setFont('helvetica', 'bold');
@@ -76,7 +75,7 @@ export class PDFService {
       .join(', ');
     doc.text(hardwareLabels || 'Standard Frame', 55, currentY + 27);
 
-    // 3. Multi-Angle 3D Product Snapshots
+    // multi angle threed product snapshots
     currentY += 38;
     doc.setFont('helvetica', 'bold');
     doc.setFontSize(11);
@@ -92,7 +91,7 @@ export class PDFService {
       doc.rect(14, currentY, heroImgWidth, heroImgHeight);
     }
 
-    // Side smaller snapshots
+    // side smaller snapshots
     const thumbWidth = 68;
     const thumbHeight = 34;
     if (snapshots.front) {
@@ -108,7 +107,7 @@ export class PDFService {
       doc.text('Back Elevation', 130, currentY + 38 + thumbHeight - 2);
     }
 
-    // 4. Custom Artwork & Face Breakdown
+    // custom artwork and face breakdown
     currentY += 80;
     doc.setFont('helvetica', 'bold');
     doc.setFontSize(11);
@@ -144,7 +143,7 @@ export class PDFService {
       });
     }
 
-    // 5. Bill of Materials & Pricing Table
+    // bill of materials and pricing table
     currentY += 53;
     doc.setFont('helvetica', 'bold');
     doc.setFontSize(11);
@@ -171,7 +170,7 @@ export class PDFService {
     doc.text('TOTAL PRE-TAX ORDER AMOUNT:', 18, bomY);
     doc.text(`$${pricing.subtotal.toFixed(2)} ${pricing.currency}`, 170, bomY);
 
-    // 6. Sign-off Approval Box
+    // sign off approval box
     const footerY = 270;
     doc.setDrawColor(203, 213, 225);
     doc.line(14, footerY, 196, footerY);

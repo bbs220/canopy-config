@@ -16,12 +16,12 @@ import {
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 
-interface FaceEditor2DProps {
+type FaceEditor2DProps = {
   section: PrintableSection;
   customization?: SectionCustomization;
   baseColor: string;
   onUpdateCustomization: (customization: SectionCustomization) => void;
-}
+};
 
 const FONT_OPTIONS = [
   { label: 'Clean Sans (Inter)', value: 'Inter, sans-serif' },
@@ -47,7 +47,7 @@ export const FaceEditor2D: React.FC<FaceEditor2DProps> = ({
   const layers = useMemo(() => customization.layers || [], [customization.layers]);
   const selectedLayer = layers.find((l) => l.id === selectedLayerId);
 
-  // Render 2D Canvas
+  // render twod canvas
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -58,16 +58,16 @@ export const FaceEditor2D: React.FC<FaceEditor2DProps> = ({
     const width = canvas.width;
     const height = canvas.height;
 
-    // Background
+    // background
     ctx.fillStyle = customization.backgroundColor || baseColor;
     ctx.fillRect(0, 0, width, height);
 
-    // Subtle guide grid & margin boundary
+    // subtle guide grid and margin boundary
     ctx.strokeStyle = 'rgba(0, 0, 0, 0.08)';
     ctx.lineWidth = 1;
     ctx.strokeRect(10, 10, width - 20, height - 20);
 
-    // Render layers
+    // render layers
     layers.forEach((layer) => {
       ctx.save();
       const posX = (layer.x / 100) * width;
@@ -87,7 +87,7 @@ export const FaceEditor2D: React.FC<FaceEditor2DProps> = ({
         ctx.textBaseline = 'middle';
         ctx.fillText(layer.text, 0, 0);
 
-        // Highlight selection border
+        // highlight selection border
         if (layer.id === selectedLayerId) {
           const metrics = ctx.measureText(layer.text);
           const w = metrics.width + 16;
@@ -122,7 +122,7 @@ export const FaceEditor2D: React.FC<FaceEditor2DProps> = ({
     });
   }, [customization, baseColor, layers, selectedLayerId, onUpdateCustomization]);
 
-  // Add new Text Layer
+  // add new text layer
   const handleAddText = () => {
     const newText: TextLayer = {
       id: 'txt_' + Math.random().toString(36).substring(2, 7),
@@ -146,7 +146,7 @@ export const FaceEditor2D: React.FC<FaceEditor2DProps> = ({
     toast.success('Text added to ' + section.name);
   };
 
-  // Add Image / Logo Layer
+  // add image logo layer
   const handleUploadImage = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -186,7 +186,7 @@ export const FaceEditor2D: React.FC<FaceEditor2DProps> = ({
     e.target.value = '';
   };
 
-  // Update properties on the currently selected layer
+  // update properties on the currently selected layer
   const updateSelectedLayer = (updates: Partial<CustomizationLayer>) => {
     if (!selectedLayerId) return;
 
@@ -200,7 +200,7 @@ export const FaceEditor2D: React.FC<FaceEditor2DProps> = ({
     onUpdateCustomization({ ...customization, layers: nextLayers });
   };
 
-  // Delete layer
+  // delete layer
   const handleDeleteLayer = (id: string) => {
     const nextLayers = layers.filter((l) => l.id !== id);
     onUpdateCustomization({ ...customization, layers: nextLayers });
@@ -208,7 +208,7 @@ export const FaceEditor2D: React.FC<FaceEditor2DProps> = ({
     toast.success('Layer deleted');
   };
 
-  // Move layer order
+  // move layer order
   const handleMoveLayer = (direction: 'up' | 'down') => {
     if (!selectedLayerId) return;
     const index = layers.findIndex((l) => l.id === selectedLayerId);
@@ -224,7 +224,7 @@ export const FaceEditor2D: React.FC<FaceEditor2DProps> = ({
     onUpdateCustomization({ ...customization, layers: nextLayers });
   };
 
-  // Canvas Mouse Dragging Handlers
+  // canvas mouse dragging handlers
   const handleCanvasMouseDown = (e: React.MouseEvent<HTMLCanvasElement>) => {
     const canvas = canvasRef.current;
     if (!canvas || !selectedLayer) return;
@@ -260,7 +260,7 @@ export const FaceEditor2D: React.FC<FaceEditor2DProps> = ({
 
   return (
     <div className="card bg-base-200/50 border border-base-300 p-3 space-y-3">
-      {/* Section Header & Toolbar */}
+      {/* section header and toolbar */}
       <div className="flex items-center justify-between">
         <div>
           <div className="text-xs font-bold text-base-content flex items-center gap-1.5">
@@ -272,7 +272,7 @@ export const FaceEditor2D: React.FC<FaceEditor2DProps> = ({
           </div>
         </div>
 
-        {/* Action Buttons using DaisyUI btn */}
+        {/* action buttons using daisyui btn */}
         <div className="flex items-center gap-1.5">
           <button
             onClick={handleAddText}
@@ -300,7 +300,7 @@ export const FaceEditor2D: React.FC<FaceEditor2DProps> = ({
         </div>
       </div>
 
-      {/* 2D Canvas Stage */}
+      {/* twod canvas stage */}
       <div className="relative flex items-center justify-center p-3 bg-base-300/60 rounded-xl overflow-hidden border border-base-300">
         <canvas
           ref={canvasRef}
@@ -320,7 +320,7 @@ export const FaceEditor2D: React.FC<FaceEditor2DProps> = ({
         )}
       </div>
 
-      {/* Selected Layer Customization Controls */}
+      {/* selected layer customization controls */}
       {selectedLayer ? (
         <div className="card bg-base-100 p-3 border border-base-300 space-y-3">
           <div className="flex items-center justify-between text-xs font-bold text-base-content border-b border-base-200 pb-2">
@@ -354,7 +354,7 @@ export const FaceEditor2D: React.FC<FaceEditor2DProps> = ({
             </div>
           </div>
 
-          {/* Text-Specific Properties */}
+          {/* text specific properties */}
           {selectedLayer.type === 'text' && (
             <div className="space-y-2.5">
               <div>
@@ -395,7 +395,7 @@ export const FaceEditor2D: React.FC<FaceEditor2DProps> = ({
                 </div>
               </div>
 
-              {/* Text formatting shortcuts */}
+              {/* text formatting shortcuts */}
               <div className="flex items-center gap-1 pt-1">
                 <button
                   onClick={() => updateSelectedLayer({ isBold: !(selectedLayer as TextLayer).isBold })}
@@ -446,7 +446,7 @@ export const FaceEditor2D: React.FC<FaceEditor2DProps> = ({
             </div>
           )}
 
-          {/* Transform Controls (Scale & Rotation) */}
+          {/* transform controls scale and rotation */}
           <div className="grid grid-cols-2 gap-3 pt-2 border-t border-base-200">
             <div>
               <div className="flex justify-between text-[10px] text-base-content/60 font-bold uppercase">
@@ -489,7 +489,7 @@ export const FaceEditor2D: React.FC<FaceEditor2DProps> = ({
           </div>
         </div>
       ) : (
-        /* Layer List Selection Pills */
+        /* layer list selection pills */
         layers.length > 0 && (
           <div className="flex items-center gap-1.5 flex-wrap">
             <span className="text-[10px] uppercase font-bold text-base-content/50">Select Layer:</span>

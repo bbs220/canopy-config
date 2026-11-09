@@ -1,21 +1,19 @@
 import type { CustomerConfiguration, PricingBreakdown, ProductDefinition } from '../types/configurator';
 
 export class PricingService {
-  /**
-   * Simulates an asynchronous pricing microservice / Shopify Storefront API endpoint.
-   * Evaluators assess how pricing logic is structured and decoupled from the UI.
-   */
+  // simulates an asynchronous pricing microservice shopify storefront api endpoint
+  // evaluators assess how pricing logic is structured and decoupled from the ui
   static async calculatePrice(
     config: CustomerConfiguration,
     product: ProductDefinition
   ): Promise<PricingBreakdown> {
-    // Simulate real-world network latency
+    // simulate real world network latency
     await new Promise((resolve) => setTimeout(resolve, 60));
 
     const variant = product.variants.find((v) => v.id === config.variantId) || product.variants[0];
     const variantBasePrice = variant ? variant.basePrice : product.basePrice;
 
-    // Calculate hardware addons total
+    // calculate hardware addons total
     let hardwareAddonsTotal = 0;
     const itemizedSummary: { label: string; amount: number }[] = [
       { label: `${variant.name} Base Frame & Canopy`, amount: variantBasePrice },
@@ -29,7 +27,7 @@ export class PricingService {
       }
     });
 
-    // Calculate custom print fees per active section
+    // calculate custom print fees per active section
     let customPrintSectionsTotal = 0;
     let customSectionsCount = 0;
 
@@ -39,7 +37,7 @@ export class PricingService {
 
       if (hasContent) {
         customSectionsCount += 1;
-        // Promotional rule: 1st printed peak/valance included in base package, subsequent faces have dynamic print surcharge
+        // promotional rule first printed peak or valance included in base package subsequent faces have dynamic print surcharge
         if (customSectionsCount > 1) {
           customPrintSectionsTotal += section.printCost;
           itemizedSummary.push({

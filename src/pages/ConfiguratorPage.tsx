@@ -18,16 +18,16 @@ import confetti from 'canvas-confetti';
 import { ShieldCheck, LayoutTemplate } from 'lucide-react';
 import { useNavigate } from 'react-router';
 
-interface ConfiguratorPageProps {
+type ConfiguratorPageProps = {
   isEmbed?: boolean;
-}
+};
 
 export function ConfiguratorPage({ isEmbed = false }: ConfiguratorPageProps) {
   const navigate = useNavigate();
   const canvas3DRef = useRef<Canvas3DRef>(null);
   const atlasEngineRef = useRef<TextureAtlasEngine>(new TextureAtlasEngine());
 
-  // Zustand Store selectors
+  // zustand store selectors
   const {
     product,
     selectedVariantId,
@@ -52,7 +52,7 @@ export function ConfiguratorPage({ isEmbed = false }: ConfiguratorPageProps) {
   const currentVariant = product.variants.find((v) => v.id === selectedVariantId) || product.variants[0];
   const activeSection = product.sections.find((s) => s.id === activeSectionId) || product.sections[0];
 
-  // Texture Atlas Bake & 3D WebGL Synchronization
+  // texture atlas bake and threed webgl synchronization
   const bakeDebounceTimerRef = useRef<number | null>(null);
 
   const triggerTextureBake = useCallback(() => {
@@ -81,7 +81,7 @@ export function ConfiguratorPage({ isEmbed = false }: ConfiguratorPageProps) {
     triggerTextureBake();
   }, [triggerTextureBake]);
 
-  // Add to Cart Action
+  // add to cart action
   const handleAddToCart = async () => {
     confetti({
       particleCount: 80,
@@ -104,7 +104,7 @@ export function ConfiguratorPage({ isEmbed = false }: ConfiguratorPageProps) {
     toast.success('Configuration added to Shopify Cart!');
   };
 
-  // Download PDF Production Summary
+  // download pdf production summary
   const handleDownloadPDF = async () => {
     if (!canvas3DRef.current) return;
     setIsGeneratingPDF(true);
@@ -141,7 +141,7 @@ export function ConfiguratorPage({ isEmbed = false }: ConfiguratorPageProps) {
 
   return (
     <div className="flex flex-col h-screen w-screen bg-base-200 text-base-content overflow-hidden font-sans">
-      {/* DaisyUI Navbar Header (Hidden in Embed Mode) */}
+      {/* daisyui navbar header hidden in embed mode */}
       {!isEmbed && (
         <header className="navbar bg-base-100 border-b border-base-300 px-4 min-h-14 h-14 shrink-0 z-40 justify-between shadow-xs">
           <div className="navbar-start gap-3 w-auto">
@@ -161,10 +161,10 @@ export function ConfiguratorPage({ isEmbed = false }: ConfiguratorPageProps) {
           </div>
 
           <div className="navbar-end gap-2 w-auto">
-            {/* Theme Controller Selector */}
+            {/* theme controller selector */}
             <ThemeToggle />
 
-            {/* Shopify Iframe Preview Route Button */}
+            {/* shopify iframe preview route button */}
             <button
               onClick={() => navigate('/shopify-preview')}
               className="btn btn-outline btn-primary btn-sm gap-1.5 text-xs font-semibold"
@@ -177,9 +177,9 @@ export function ConfiguratorPage({ isEmbed = false }: ConfiguratorPageProps) {
         </header>
       )}
 
-      {/* Main Studio Viewport (Split Layout: 3D Left / Controls Right) */}
+      {/* main studio viewport split layout threed left controls right */}
       <div className="flex-1 flex flex-col lg:flex-row overflow-hidden relative">
-        {/* 3D WebGL Canvas Container */}
+        {/* threed webgl canvas container */}
         <div className="flex-1 relative bg-base-300/40 overflow-hidden h-1/2 lg:h-full">
           <Canvas3D
             ref={canvas3DRef}
@@ -189,9 +189,9 @@ export function ConfiguratorPage({ isEmbed = false }: ConfiguratorPageProps) {
           />
         </div>
 
-        {/* Right Customization Drawer with DaisyUI Card / Tabs */}
+        {/* right customization drawer with daisyui card tabs */}
         <div className="w-full lg:w-[480px] xl:w-[520px] bg-base-100 border-l border-base-300 flex flex-col shrink-0 h-1/2 lg:h-full overflow-hidden shadow-xl z-20">
-          {/* DaisyUI Tabs Header */}
+          {/* daisyui tabs header */}
           <div className="p-2 border-b border-base-300 bg-base-200/50 shrink-0">
             <div className="tabs tabs-box w-full grid grid-cols-4">
               <button
@@ -221,7 +221,7 @@ export function ConfiguratorPage({ isEmbed = false }: ConfiguratorPageProps) {
             </div>
           </div>
 
-          {/* Active Tab Content Panel */}
+          {/* active tab content panel */}
           <div className="flex-1 overflow-y-auto p-4 space-y-5">
             {activeTab === 'print' && (
               <div className="space-y-4">
@@ -275,7 +275,7 @@ export function ConfiguratorPage({ isEmbed = false }: ConfiguratorPageProps) {
         </div>
       </div>
 
-      {/* Sticky Bottom Pricing & Action Bar */}
+      {/* sticky bottom pricing and action bar */}
       <PriceActionBar
         pricing={pricing}
         isLoadingPrice={isLoadingPrice}
@@ -284,7 +284,7 @@ export function ConfiguratorPage({ isEmbed = false }: ConfiguratorPageProps) {
         isGeneratingPDF={isGeneratingPDF}
       />
 
-      {/* Shopify Cart Payload Inspector Modal */}
+      {/* shopify cart payload inspector modal */}
       <ShopifyPayloadModal
         isOpen={Boolean(shopifyModalPayload)}
         onClose={() => setShopifyModalPayload(null)}

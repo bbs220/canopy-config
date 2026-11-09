@@ -2,11 +2,11 @@ import React from 'react';
 import type { HardwareOption } from '../../types/configurator';
 import { Shield, PackagePlus } from 'lucide-react';
 
-interface HardwareSelectorProps {
+type HardwareSelectorProps = {
   options: HardwareOption[];
   selectedIds: string[];
   onToggleOption: (id: string) => void;
-}
+};
 
 export const HardwareSelector: React.FC<HardwareSelectorProps> = ({
   options,
@@ -18,7 +18,7 @@ export const HardwareSelector: React.FC<HardwareSelectorProps> = ({
 
   return (
     <div className="space-y-4">
-      {/* Frame Selection */}
+      {/* frame selection */}
       <div className="space-y-2">
         <div className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-base-content/70">
           <Shield className="w-3.5 h-3.5 text-primary" />
@@ -68,7 +68,7 @@ export const HardwareSelector: React.FC<HardwareSelectorProps> = ({
         </div>
       </div>
 
-      {/* Accessories Selection */}
+      {/* accessories selection */}
       <div className="space-y-2">
         <div className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-base-content/70">
           <PackagePlus className="w-3.5 h-3.5 text-secondary" />

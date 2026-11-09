@@ -1,9 +1,7 @@
 import type { CustomerConfiguration, PricingBreakdown, ProductDefinition, ShopifyCartPayload } from '../types/configurator';
 
 export class ShopifyService {
-  /**
-   * Generates standard Shopify Line Item Properties and cart payload formatted for `/cart/add.js`
-   */
+  // generates standard shopify line item properties and cart payload formatted for cart add js
   static buildCartPayload(
     config: CustomerConfiguration,
     product: ProductDefinition,
@@ -23,10 +21,10 @@ export class ShopifyService {
       .map(([id]) => product.sections.find((s) => s.id === id)?.name || id)
       .join(', ');
 
-    // Generate unique configuration ID for factory traceability
+    // generate unique configuration id for factory traceability
     const configId = 'CFG-' + Math.random().toString(36).substring(2, 9).toUpperCase();
 
-    // Mock Shopify variant numeric ID (in production, mapped to Shopify Admin variant inventory IDs)
+    // mock shopify variant numeric id in production mapped to shopify admin variant inventory ids
     const mockShopifyVariantId = variant.id === 'tent-5x5' ? 440192019 : variant.id === 'tent-6.5x6.5' ? 440192020 : 440192021;
 
     return {
@@ -49,9 +47,7 @@ export class ShopifyService {
     };
   }
 
-  /**
-   * Dispatches the cart payload to parent window if running inside an iframe (e.g. embedded on Shopify PDP)
-   */
+  // dispatches the cart payload to parent window if running inside an iframe
   static dispatchToHostStore(payload: ShopifyCartPayload) {
     if (window.parent && window.parent !== window) {
       window.parent.postMessage(
@@ -66,9 +62,7 @@ export class ShopifyService {
     }
   }
 
-  /**
-   * Listens for inbound messages from parent Shopify window (e.g. host updating product variant or theme)
-   */
+  // listens for inbound messages from parent shopify window
   static listenToHostMessages(onMessage: (data: unknown) => void) {
     const handler = (event: MessageEvent) => {
       if (event.data && typeof event.data === 'object' && 'type' in event.data) {
