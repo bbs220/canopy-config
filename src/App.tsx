@@ -1,12 +1,17 @@
-import { createBrowserRouter, RouterProvider, Outlet, Navigate } from 'react-router';
-import { ConfiguratorPage } from './pages/ConfiguratorPage';
-import { ShopifyStorePage } from './pages/ShopifyStorePage';
-import { Toaster } from 'react-hot-toast';
+import {
+  createBrowserRouter,
+  RouterProvider,
+  Outlet,
+  Navigate,
+} from "react-router";
+import { ConfiguratorPage } from "./pages/ConfiguratorPage";
+import { ShopifyStorePage } from "./pages/ShopifyStorePage";
+import { Toaster } from "react-hot-toast";
 
 function RootLayout() {
   return (
     <>
-      <Toaster position="top-right" />
+      <Toaster position="top-center" />
       <Outlet />
     </>
   );
@@ -17,19 +22,19 @@ const router = createBrowserRouter([
     element: <RootLayout />,
     children: [
       {
-        path: '/',
+        path: "/",
         element: <ConfiguratorPage />,
       },
       {
-        path: '/embed',
+        path: "/embed",
         element: <ConfiguratorPage isEmbed={true} />,
       },
       {
-        path: '/shopify-preview',
+        path: "/shopify-preview",
         element: <ShopifyStorePage />,
       },
       {
-        path: '*',
+        path: "*",
         element: <Navigate to="/" replace />,
       },
     ],
