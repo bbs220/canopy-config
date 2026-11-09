@@ -101,9 +101,9 @@ export const TENT_PRODUCT: ProductDefinition = {
         uMin: 0.256,
         uMax: 0.745,
         vMin: 0.537,
-        vMax: 0.969,
+        vMax: 0.886,
       },
-      aspectRatio: 1.15,
+      aspectRatio: 1.4,
       cameraView: {
         position: [0, 1.7, 3.2],
         target: [0, 1.4, 0],
@@ -118,10 +118,10 @@ export const TENT_PRODUCT: ProductDefinition = {
       uvRegion: {
         uMin: 0.257,
         uMax: 0.745,
-        vMin: 0.919,
-        vMax: 0.968,
+        vMin: 0.886,
+        vMax: 0.969,
       },
-      aspectRatio: 6.5,
+      aspectRatio: 5.9,
       cameraView: {
         position: [0, 1.15, 2.7],
         target: [0, 1.05, 0],

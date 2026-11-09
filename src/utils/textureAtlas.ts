@@ -98,7 +98,7 @@ export class TextureAtlasEngine {
       const img = this.loadedImages.get(layer.src);
       if (img && img.complete) {
         // base image width based on scale
-        const baseWidth = (canvasWidth * 0.4) * layer.scale;
+        const baseWidth = (canvasWidth * 0.45) * layer.scale;
         const baseHeight = baseWidth / (layer.aspectRatio || 1);
         ctx.drawImage(img, -baseWidth / 2, -baseHeight / 2, baseWidth, baseHeight);
       }
@@ -154,7 +154,9 @@ export class TextureAtlasEngine {
       const targetH = (vMax - vMin) * MASTER_TEXTURE_SIZE;
 
       // render section to a virtual high res buffer
-      const sectionCanvas = this.renderSectionToCanvas(customData, baseColor, 1024, 1024);
+      const sectionWidth = Math.max(64, Math.round(targetW * 2));
+      const sectionHeight = Math.max(64, Math.round(targetH * 2));
+      const sectionCanvas = this.renderSectionToCanvas(customData, baseColor, sectionWidth, sectionHeight);
 
       // blit section canvas into atlas
       ctx.drawImage(sectionCanvas, targetX, targetY, targetW, targetH);

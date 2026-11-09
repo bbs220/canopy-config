@@ -47,6 +47,12 @@ export const FaceEditor2D: React.FC<FaceEditor2DProps> = ({
   const layers = useMemo(() => customization.layers || [], [customization.layers]);
   const selectedLayer = layers.find((l) => l.id === selectedLayerId);
 
+  // canvas dimensions matching section aspect ratio
+  const canvasWidth = section.category === 'valance' ? 700 : 420;
+  const canvasHeight = Math.round(
+    canvasWidth / (section.aspectRatio || (section.category === 'valance' ? 5.9 : 1.4))
+  );
+
   // render twod canvas
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -63,9 +69,11 @@ export const FaceEditor2D: React.FC<FaceEditor2DProps> = ({
     ctx.fillRect(0, 0, width, height);
 
     // subtle guide grid and margin boundary
-    ctx.strokeStyle = 'rgba(0, 0, 0, 0.08)';
-    ctx.lineWidth = 1;
-    ctx.strokeRect(10, 10, width - 20, height - 20);
+    if (section.category === 'valance') {
+      ctx.strokeStyle = 'rgba(0, 0, 0, 0.08)';
+      ctx.lineWidth = 1;
+      ctx.strokeRect(10, 10, width - 20, height - 20);
+    }
 
     // render layers
     layers.forEach((layer) => {
@@ -120,7 +128,89 @@ export const FaceEditor2D: React.FC<FaceEditor2DProps> = ({
 
       ctx.restore();
     });
-  }, [customization, baseColor, layers, selectedLayerId, onUpdateCustomization]);
+
+    // triangular safe print boundary for canopy peak
+    if (section.category === 'peak') {
+      const apexX = width * 0.5;
+      const apexY = 0;
+
+      // shaded clipped corner overlay for peak
+      ctx.save();
+      ctx.beginPath();
+      ctx.moveTo(0, 0);
+      ctx.lineTo(apexX, apexY);
+      ctx.lineTo(0, height);
+      ctx.closePath();
+      ctx.fillStyle = 'rgba(15, 23, 42, 0.45)';
+      ctx.fill();
+
+      ctx.clip();
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.12)';
+      ctx.lineWidth = 1.5;
+      for (let p = -height; p < width; p += 16) {
+        ctx.beginPath();
+        ctx.moveTo(p, 0);
+        ctx.lineTo(p + height, height);
+        ctx.stroke();
+      }
+      ctx.restore();
+
+      ctx.save();
+      ctx.beginPath();
+      ctx.moveTo(width, 0);
+      ctx.lineTo(apexX, apexY);
+      ctx.lineTo(width, height);
+      ctx.closePath();
+      ctx.fillStyle = 'rgba(15, 23, 42, 0.45)';
+      ctx.fill();
+
+      ctx.clip();
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.12)';
+      ctx.lineWidth = 1.5;
+      for (let p = -height; p < width * 2; p += 16) {
+        ctx.beginPath();
+        ctx.moveTo(p, 0);
+        ctx.lineTo(p + height, height);
+        ctx.stroke();
+      }
+      ctx.restore();
+
+      // dotted boundary line along peak edges
+      ctx.save();
+      ctx.setLineDash([6, 6]);
+      ctx.lineWidth = 2;
+      ctx.strokeStyle = '#F59E0B';
+      ctx.shadowColor = 'rgba(0, 0, 0, 0.5)';
+      ctx.shadowBlur = 3;
+      ctx.beginPath();
+      ctx.moveTo(0, height);
+      ctx.lineTo(apexX, apexY);
+      ctx.lineTo(width, height);
+      ctx.stroke();
+
+      ctx.font = 'bold 10px Inter, sans-serif';
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.7)';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.shadowColor = 'transparent';
+      ctx.shadowBlur = 0;
+      ctx.fillText('CLIPPED AREA', width * 0.16, height * 0.35);
+      ctx.fillText('CLIPPED AREA', width * 0.84, height * 0.35);
+
+      ctx.fillStyle = '#F59E0B';
+      ctx.beginPath();
+      ctx.arc(apexX, 4, 3, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.font = 'bold 9px Inter, sans-serif';
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.85)';
+      ctx.fillText('APEX', apexX, 16);
+
+      ctx.font = '9px Inter, sans-serif';
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.45)';
+      ctx.fillText('PRINTABLE PEAK AREA', apexX, height - 8);
+      ctx.restore();
+    }
+  }, [customization, baseColor, layers, selectedLayerId, onUpdateCustomization, section]);
 
   // add new text layer
   const handleAddText = () => {
@@ -265,10 +355,18 @@ export const FaceEditor2D: React.FC<FaceEditor2DProps> = ({
         <div>
           <div className="text-xs font-bold text-base-content flex items-center gap-1.5">
             <span>{section.name} 2D Editor</span>
-            <span className="badge badge-primary badge-xs">Live 3D Sync</span>
+            {section.category === 'peak' ? (
+              <span className="badge badge-warning badge-xs font-semibold">
+                Dotted Safe Zone
+              </span>
+            ) : (
+              <span className="badge badge-primary badge-xs">Live 3D Sync</span>
+            )}
           </div>
           <div className="text-[11px] text-base-content/60">
-            {section.category === 'peak' ? 'High visibility peak banner' : 'Eye-level perimeter skirt'}
+            {section.category === 'peak'
+              ? 'Triangle safe print area — corners outside dotted lines are clipped'
+              : 'Eye-level perimeter skirt with matching aspect ratio'}
           </div>
         </div>
 
@@ -304,8 +402,8 @@ export const FaceEditor2D: React.FC<FaceEditor2DProps> = ({
       <div className="relative flex items-center justify-center p-3 bg-base-300/60 rounded-xl overflow-hidden border border-base-300">
         <canvas
           ref={canvasRef}
-          width={section.category === 'valance' ? 700 : 400}
-          height={section.category === 'valance' ? 140 : 350}
+          width={canvasWidth}
+          height={canvasHeight}
           onMouseDown={handleCanvasMouseDown}
           onMouseMove={handleCanvasMouseMove}
           onMouseUp={handleCanvasMouseUp}
