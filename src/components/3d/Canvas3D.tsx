@@ -169,11 +169,11 @@ export const PrimaryScene = () => {
       label: "auto rotate speed",
     },
     showGizmo: {
-      value: false,
+      value: true,
       label: "show gizmo",
     },
     showFPS: {
-      value: false,
+      value: true,
       label: "show fps",
     },
   });
