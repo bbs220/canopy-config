@@ -40,50 +40,56 @@ export class PDFService {
     doc.setFontSize(14);
     doc.text('CUSTOM CANOPY TENT — PRODUCTION SPECIFICATION PROOF', 14, 15);
 
-    doc.setFont('helvetica', 'normal');
-    doc.setFontSize(9);
-    doc.text(`DATE: ${dateStr}`, 165, 11);
-    doc.text(`REF ID: ${orderId}`, 165, 17);
-
     // order metadata box
-    let currentY = 32;
+    let currentY = 31;
     doc.setTextColor(30, 41, 59);
     doc.setFont('helvetica', 'bold');
     doc.setFontSize(11);
     doc.text('1. Product Configuration & Hardware', 14, currentY);
 
-    currentY += 5;
+    const selectedHardware = config.selectedHardwareIds
+      .map((id) => product.hardwareOptions.find((h) => h.id === id)?.name)
+      .filter((name): name is string => Boolean(name))
+      .map((name) => name.replace(/^Commercial\s+/, '').replace(/^Heavy-Duty\s+/, ''));
+
+    const hardwareItems = selectedHardware.length > 0 ? selectedHardware : ['Standard Steel Frame'];
+    const extraRows = Math.max(0, hardwareItems.length - 1);
+    const boxHeight = 34 + extraRows * 5;
+
+    currentY += 3.5;
     doc.setFillColor(248, 250, 252);
     doc.setDrawColor(226, 232, 240);
-    doc.rect(14, currentY, 182, 30, 'FD');
+    doc.rect(14, currentY, 182, boxHeight, 'FD');
 
     doc.setFont('helvetica', 'bold');
     doc.setFontSize(9);
-    doc.text('Selected Variant:', 18, currentY + 7);
-    doc.text('Dimensions:', 18, currentY + 14);
-    doc.text('Canopy Base Color:', 18, currentY + 21);
-    doc.text('Selected Hardware:', 18, currentY + 27);
+    doc.text('Reference ID:', 18, currentY + 5);
+    doc.text('Order Date:', 18, currentY + 10);
+    doc.text('Selected Variant:', 18, currentY + 15);
+    doc.text('Dimensions:', 18, currentY + 20);
+    doc.text('Canopy Base Color:', 18, currentY + 25);
+    doc.text('Selected Hardware:', 18, currentY + 30);
 
     doc.setFont('helvetica', 'normal');
-    doc.text(`${variant.name} (SKU: CANOPY-${variant.id.toUpperCase()})`, 55, currentY + 7);
-    doc.text(`${variant.dimensions.width} x ${variant.dimensions.depth} • Height: ${variant.dimensions.height}`, 55, currentY + 14);
-    doc.text(`${baseColorObj?.name || 'Custom'} (${config.baseColor}) ${baseColorObj?.pantone ? `[${baseColorObj.pantone}]` : ''}`, 55, currentY + 21);
+    doc.text(orderId, 55, currentY + 5);
+    doc.text(dateStr, 55, currentY + 10);
+    doc.text(`${variant.name} (SKU: CANOPY-${variant.id.toUpperCase()})`, 55, currentY + 15);
+    doc.text(`${variant.dimensions.width} x ${variant.dimensions.depth} • Height: ${variant.dimensions.height}`, 55, currentY + 20);
+    doc.text(`${baseColorObj?.name || 'Custom'} (${config.baseColor}) ${baseColorObj?.pantone ? `[${baseColorObj.pantone}]` : ''}`, 55, currentY + 25);
 
-    const hardwareLabels = config.selectedHardwareIds
-      .map((id) => product.hardwareOptions.find((h) => h.id === id)?.name)
-      .filter(Boolean)
-      .join(', ');
-    doc.text(hardwareLabels || 'Standard Frame', 55, currentY + 27);
+    hardwareItems.forEach((item, index) => {
+      doc.text(`• ${item}`, 55, currentY + 30 + index * 5, { maxWidth: 135 });
+    });
 
     // multi angle threed product snapshots
-    currentY += 38;
+    currentY += boxHeight + 9.5;
     doc.setFont('helvetica', 'bold');
     doc.setFontSize(11);
     doc.text('2. 3D Visual Rendering (Multi-Angle Preview)', 14, currentY);
 
-    currentY += 5;
+    currentY += 3.5;
     const heroImgWidth = 110;
-    const heroImgHeight = 72;
+    const heroImgHeight = 70;
 
     if (snapshots.isometric) {
       doc.addImage(snapshots.isometric, 'PNG', 14, currentY, heroImgWidth, heroImgHeight);
@@ -93,7 +99,7 @@ export class PDFService {
 
     // side smaller snapshots
     const thumbWidth = 68;
-    const thumbHeight = 34;
+    const thumbHeight = 33;
     if (snapshots.front) {
       doc.addImage(snapshots.front, 'PNG', 128, currentY, thumbWidth, thumbHeight);
       doc.rect(128, currentY, thumbWidth, thumbHeight);
@@ -101,23 +107,24 @@ export class PDFService {
       doc.text('Front Elevation', 130, currentY + thumbHeight - 2);
     }
     if (snapshots.back) {
-      doc.addImage(snapshots.back, 'PNG', 128, currentY + 38, thumbWidth, thumbHeight);
-      doc.rect(128, currentY + 38, thumbWidth, thumbHeight);
+      doc.addImage(snapshots.back, 'PNG', 128, currentY + 37, thumbWidth, thumbHeight);
+      doc.rect(128, currentY + 37, thumbWidth, thumbHeight);
       doc.setFontSize(8);
-      doc.text('Back Elevation', 130, currentY + 38 + thumbHeight - 2);
+      doc.text('Back Elevation', 130, currentY + 37 + thumbHeight - 2);
     }
 
     // custom artwork and face breakdown
-    currentY += 80;
+    currentY += heroImgHeight + 9.5;
     doc.setFont('helvetica', 'bold');
     doc.setFontSize(11);
     doc.text('3. Custom Print Locations & Artwork Manifest', 14, currentY);
 
-    currentY += 5;
+    const sec3BoxHeight = 32;
+    currentY += 3.5;
     doc.setFillColor(248, 250, 252);
-    doc.rect(14, currentY, 182, 45, 'FD');
+    doc.rect(14, currentY, 182, sec3BoxHeight, 'FD');
 
-    let printY = currentY + 7;
+    let printY = currentY + 6;
     doc.setFontSize(9);
 
     const customizedSections = Object.entries(config.sections).filter(
@@ -144,12 +151,12 @@ export class PDFService {
     }
 
     // bill of materials and pricing table
-    currentY += 53;
+    currentY += sec3BoxHeight + 9.5;
     doc.setFont('helvetica', 'bold');
     doc.setFontSize(11);
     doc.text('4. Bill of Materials & Pricing Handoff', 14, currentY);
 
-    currentY += 5;
+    currentY += 3.5;
     doc.setFillColor(241, 245, 249);
     doc.rect(14, currentY, 182, 6, 'F');
     doc.setFontSize(8);

@@ -212,25 +212,25 @@ export function ConfiguratorPage({ isEmbed = false }: ConfiguratorPageProps) {
                 onClick={() => setActiveTab("print")}
                 className={`tab tab-sm font-bold text-xs ${activeTab === "print" ? "tab-active" : ""}`}
               >
-                1. Artwork
+                Artwork
               </button>
               <button
                 onClick={() => setActiveTab("size")}
                 className={`tab tab-sm font-bold text-xs ${activeTab === "size" ? "tab-active" : ""}`}
               >
-                2. Size
+                Size
               </button>
               <button
                 onClick={() => setActiveTab("color")}
                 className={`tab tab-sm font-bold text-xs ${activeTab === "color" ? "tab-active" : ""}`}
               >
-                3. Color
+                Color
               </button>
               <button
                 onClick={() => setActiveTab("hardware")}
                 className={`tab tab-sm font-bold text-xs ${activeTab === "hardware" ? "tab-active" : ""}`}
               >
-                4. Hardware
+                Hardware
               </button>
             </div>
           </div>
