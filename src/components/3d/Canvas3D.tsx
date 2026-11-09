@@ -9,15 +9,12 @@ import {
   useMemo,
 } from 'react';
 import * as THREE from 'three';
-import { Canvas, useThree } from '@react-three/fiber';
-import { OrbitControls, ContactShadows, useGLTF } from '@react-three/drei';
-import type { OrbitControls as OrbitControlsImpl } from 'three-stdlib';
+import { Canvas } from '@react-three/fiber';
+import { ContactShadows, useGLTF } from '@react-three/drei';
+import { CameraRig, type CameraRigRef } from './CameraRig';
 import { ViewControls, type CameraPreset } from './ViewControls';
 import { useTweakpane } from '../../hooks/useTweakepane';
 import { useThemeStore } from '../../store/useThemeStore';
-import { TENT_PRODUCT } from '../../config/tentProduct';
-import { useGSAP } from '@gsap/react';
-import gsap from 'gsap';
 
 export interface Canvas3DRef {
   takeSnapshot: (angle?: CameraPreset) => Promise<string>;
@@ -32,18 +29,6 @@ interface Canvas3DProps {
   activeSectionId?: string;
   className?: string;
 }
-
-const PRESET_CAMERA_VIEWS: Record<
-  CameraPreset,
-  { position: [number, number, number]; target: [number, number, number] }
-> = {
-  isometric: { position: [2.8, 2.2, 3.2], target: [0, 1.2, 0] },
-  front: { position: [0, 1.4, 3.4], target: [0, 1.2, 0] },
-  right: { position: [3.4, 1.4, 0], target: [0, 1.2, 0] },
-  back: { position: [0, 1.4, -3.4], target: [0, 1.2, 0] },
-  left: { position: [-3.4, 1.4, 0], target: [0, 1.2, 0] },
-  top: { position: [0, 4.2, 0.01], target: [0, 1.2, 0] },
-};
 
 // Preload all 3 size variant GLTF models
 useGLTF.preload('/models/Tent_5_5.glb');
@@ -68,7 +53,15 @@ function TentModel({
   onLoaded,
 }: ModelProps) {
   const { scene } = useGLTF(url);
-  const clonedScene = useMemo(() => scene.clone(true), [scene]);
+  const clonedScene = useMemo(() => {
+    const clone = scene.clone(true);
+    const box = new THREE.Box3().setFromObject(clone);
+    const center = box.getCenter(new THREE.Vector3());
+    clone.position.x = -center.x;
+    clone.position.z = -center.z;
+    clone.position.y = -box.min.y;
+    return clone;
+  }, [scene]);
   const fabricMaterialRef = useRef<THREE.MeshStandardMaterial | null>(null);
   const canvasTextureRef = useRef<THREE.CanvasTexture | null>(null);
 
@@ -126,62 +119,7 @@ function TentModel({
     }
   }, [baseColor]);
 
-  // Ground and center model at Y=0
-  useEffect(() => {
-    const box = new THREE.Box3().setFromObject(clonedScene);
-    const center = box.getCenter(new THREE.Vector3());
-    clonedScene.position.x = -center.x;
-    clonedScene.position.z = -center.z;
-    clonedScene.position.y = -box.min.y;
-  }, [clonedScene]);
-
   return <primitive object={clonedScene} />;
-}
-
-// Scene Bridge to access Three.js state (camera, gl, controls) from parent
-interface SceneBridgeProps {
-  onReady: (bridge: {
-    camera: THREE.PerspectiveCamera;
-    gl: THREE.WebGLRenderer;
-    controls: OrbitControlsImpl | null;
-  }) => void;
-  controlsRef: React.RefObject<OrbitControlsImpl | null>;
-  isAutoRotating: boolean;
-  autoRotateSpeed: number;
-}
-
-function SceneBridge({
-  onReady,
-  controlsRef,
-  isAutoRotating,
-  autoRotateSpeed,
-}: SceneBridgeProps) {
-  const { camera, gl } = useThree();
-
-  useEffect(() => {
-    onReady({
-      camera: camera as THREE.PerspectiveCamera,
-      gl,
-      controls: controlsRef.current,
-    });
-  }, [camera, gl, controlsRef, onReady]);
-
-  return (
-    <OrbitControls
-      ref={controlsRef}
-      enableRotate={true}
-      enableZoom={true}
-      enablePan={true}
-      enableDamping={true}
-      dampingFactor={0.05}
-      minDistance={1.4}
-      maxDistance={7.5}
-      maxPolarAngle={Math.PI / 2 + 0.02}
-      target={[0, 1.2, 0]}
-      autoRotate={isAutoRotating}
-      autoRotateSpeed={autoRotateSpeed}
-    />
-  );
 }
 
 export const Canvas3D = forwardRef<Canvas3DRef, Canvas3DProps>(({
@@ -195,16 +133,7 @@ export const Canvas3D = forwardRef<Canvas3DRef, Canvas3DProps>(({
   const [activeTextureCanvas, setActiveTextureCanvas] = useState<HTMLCanvasElement | null>(null);
   const [activeBaseColor, setActiveBaseColor] = useState<string>(baseColor);
 
-  const containerRef = useRef<HTMLDivElement>(null);
-  const controlsRef = useRef<OrbitControlsImpl | null>(null);
-  const sceneBridgeRef = useRef<{
-    camera: THREE.PerspectiveCamera;
-    gl: THREE.WebGLRenderer;
-    controls: OrbitControlsImpl | null;
-  } | null>(null);
-
-  // Official @gsap/react hook integration with scoped context & memory-safe cleanup
-  const { contextSafe } = useGSAP({ scope: containerRef });
+  const cameraRigRef = useRef<CameraRigRef>(null);
 
   const theme = useThemeStore((s) => s.theme);
   const bgColor = theme === 'dark' ? '#1d232a' : '#f3f4f6';
@@ -219,81 +148,22 @@ export const Canvas3D = forwardRef<Canvas3DRef, Canvas3DProps>(({
     autoRotateSpeed: { value: 1.5, min: 0.1, max: 6.0, step: 0.2, folder: 'Camera' },
   });
 
-  // Focus Section via GSAP contextSafe
-  const focusSection = contextSafe((sectionId: string) => {
-    const section = TENT_PRODUCT.sections.find((s) => s.id === sectionId);
-    const bridge = sceneBridgeRef.current;
-    if (!section || !bridge) return;
-
+  // Focus Section via CameraRig
+  const focusSection = useCallback((sectionId: string) => {
     setIsAutoRotating(false);
-    gsap.to(bridge.camera.position, {
-      x: section.cameraView.position[0],
-      y: section.cameraView.position[1],
-      z: section.cameraView.position[2],
-      duration: 1.0,
-      ease: 'power2.out',
-    });
-    if (controlsRef.current) {
-      gsap.to(controlsRef.current.target, {
-        x: section.cameraView.target[0],
-        y: section.cameraView.target[1],
-        z: section.cameraView.target[2],
-        duration: 1.0,
-        ease: 'power2.out',
-      });
-    }
-  });
+    cameraRigRef.current?.focusSection(sectionId);
+  }, []);
 
-  // Set Camera Preset via GSAP contextSafe
-  const setCameraPreset = contextSafe((preset: CameraPreset) => {
-    const view = PRESET_CAMERA_VIEWS[preset];
-    const bridge = sceneBridgeRef.current;
-    if (!view || !bridge) return;
-
+  // Set Camera Preset via CameraRig
+  const setCameraPreset = useCallback((preset: CameraPreset) => {
     setCurrentPreset(preset);
     setIsAutoRotating(false);
-    gsap.to(bridge.camera.position, {
-      x: view.position[0],
-      y: view.position[1],
-      z: view.position[2],
-      duration: 1.1,
-      ease: 'power2.out',
-    });
-    if (controlsRef.current) {
-      gsap.to(controlsRef.current.target, {
-        x: view.target[0],
-        y: view.target[1],
-        z: view.target[2],
-        duration: 1.1,
-        ease: 'power2.out',
-      });
-    }
-  });
+    cameraRigRef.current?.setCameraPreset(preset);
+  }, []);
 
   // High-Res WebGL Snapshot
   const takeSnapshot = useCallback(async (preset: CameraPreset = 'isometric'): Promise<string> => {
-    const bridge = sceneBridgeRef.current;
-    if (!bridge || !controlsRef.current) return '';
-
-    const { camera, gl } = bridge;
-    const view = PRESET_CAMERA_VIEWS[preset];
-
-    const originalPos = camera.position.clone();
-    const originalTarget = controlsRef.current.target.clone();
-
-    camera.position.set(...view.position);
-    controlsRef.current.target.set(...view.target);
-    camera.lookAt(...view.target);
-    controlsRef.current.update();
-
-    gl.render(gl.domElement as unknown as THREE.Scene, camera);
-    const dataUrl = gl.domElement.toDataURL('image/png');
-
-    camera.position.copy(originalPos);
-    controlsRef.current.target.copy(originalTarget);
-    controlsRef.current.update();
-
-    return dataUrl;
+    return (await cameraRigRef.current?.takeSnapshot(preset)) ?? '';
   }, []);
 
   // Update canvas texture
@@ -317,15 +187,14 @@ export const Canvas3D = forwardRef<Canvas3DRef, Canvas3DProps>(({
   // Sync camera when active section changes
   useEffect(() => {
     if (activeSectionId) {
-      focusSection(activeSectionId);
+      cameraRigRef.current?.focusSection(activeSectionId);
     }
-  }, [activeSectionId, focusSection]);
+  }, [activeSectionId]);
 
   return (
-    <div ref={containerRef} className={`relative w-full h-full select-none overflow-hidden ${className}`}>
-      {/* Declarative R3F Canvas */}
+    <div className={`relative w-full h-full select-none overflow-hidden ${className}`}>
+      {/* Declarative R3F Canvas - no camera prop, PerspectiveCamera is mounted inside CameraRig */}
       <Canvas
-        camera={{ position: [2.8, 2.2, 3.2], fov: 40 }}
         gl={{
           antialias: true,
           preserveDrawingBuffer: true,
@@ -358,12 +227,9 @@ export const Canvas3D = forwardRef<Canvas3DRef, Canvas3DProps>(({
         <directionalLight position={[-5, 4, -4]} intensity={1.0} color="#e0f2fe" />
         <directionalLight position={[0, 6, -5]} intensity={0.8} />
 
-        {/* Declarative Drei Controls */}
-        <SceneBridge
-          onReady={(bridge) => {
-            sceneBridgeRef.current = bridge;
-          }}
-          controlsRef={controlsRef}
+        {/* Encapsulated Camera & OrbitControls Rig with PerspectiveCamera */}
+        <CameraRig
+          ref={cameraRigRef}
           isAutoRotating={isAutoRotating}
           autoRotateSpeed={tweakParams.autoRotateSpeed}
         />
