@@ -19,7 +19,7 @@ export const SectionTabs: React.FC<SectionTabsProps> = ({
   const valances = sections.filter((s) => s.category === 'valance');
 
   return (
-    <div className="space-y-2.5">
+    <div className="space-y-2.5 w-full max-w-full">
       <div className="flex items-center justify-between">
         <label className="text-xs font-bold uppercase tracking-wider text-base-content/70">
           Printable Canopy Zones
@@ -31,7 +31,7 @@ export const SectionTabs: React.FC<SectionTabsProps> = ({
         <div className="text-[11px] font-semibold text-base-content/60">
           Roof Peaks (Long-Range Visibility)
         </div>
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5">
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5 w-full">
           {peaks.map((section) => {
             const isActive = activeSectionId === section.id;
             const hasCustomContent =
@@ -42,13 +42,13 @@ export const SectionTabs: React.FC<SectionTabsProps> = ({
               <button
                 key={section.id}
                 onClick={() => onSelectSection(section.id)}
-                className={`btn btn-sm text-xs font-bold transition-all justify-between px-2.5 ${
+                className={`btn btn-sm text-xs font-bold transition-all justify-between px-2.5 min-w-0 ${
                   isActive
                     ? 'btn-primary shadow-sm'
                     : 'btn-outline border-base-300 hover:border-primary/50 bg-base-100 text-base-content'
                 }`}
               >
-                <span>{section.shortName}</span>
+                <span className="truncate">{section.shortName}</span>
                 {hasCustomContent && (
                   <CheckCircle2
                     className={`w-3.5 h-3.5 shrink-0 ${
@@ -67,7 +67,7 @@ export const SectionTabs: React.FC<SectionTabsProps> = ({
         <div className="text-[11px] font-semibold text-base-content/60">
           Valance Skirts (Eye-Level Brand / URL)
         </div>
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5">
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5 w-full">
           {valances.map((section) => {
             const isActive = activeSectionId === section.id;
             const hasCustomContent =
@@ -78,13 +78,13 @@ export const SectionTabs: React.FC<SectionTabsProps> = ({
               <button
                 key={section.id}
                 onClick={() => onSelectSection(section.id)}
-                className={`btn btn-sm text-xs font-bold transition-all justify-between px-2.5 ${
+                className={`btn btn-sm text-xs font-bold transition-all justify-between px-2.5 min-w-0 ${
                   isActive
                     ? 'btn-primary shadow-sm'
                     : 'btn-outline border-base-300 hover:border-primary/50 bg-base-100 text-base-content'
                 }`}
               >
-                <span>{section.shortName}</span>
+                <span className="truncate">{section.shortName}</span>
                 {hasCustomContent && (
                   <CheckCircle2
                     className={`w-3.5 h-3.5 shrink-0 ${

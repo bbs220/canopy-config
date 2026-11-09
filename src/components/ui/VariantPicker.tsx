@@ -14,7 +14,7 @@ export const VariantPicker: React.FC<VariantPickerProps> = ({
   onSelectVariant,
 }) => {
   return (
-    <div className="space-y-3">
+    <div className="space-y-3 w-full max-w-full">
       <div className="flex items-center justify-between">
         <label className="text-xs font-bold uppercase tracking-wider text-base-content/70">
           Select Tent Size Variant
@@ -25,7 +25,7 @@ export const VariantPicker: React.FC<VariantPickerProps> = ({
         </div>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 w-full">
         {variants.map((variant) => {
           const isSelected = selectedVariantId === variant.id;
 
@@ -33,19 +33,19 @@ export const VariantPicker: React.FC<VariantPickerProps> = ({
             <button
               key={variant.id}
               onClick={() => onSelectVariant(variant.id)}
-              className={`card bg-base-100 border text-left transition-all p-3 cursor-pointer ${
+              className={`card bg-base-100 border text-left transition-all p-3 cursor-pointer min-w-0 ${
                 isSelected
                   ? 'border-primary ring-2 ring-primary/20 shadow-md bg-primary/5'
                   : 'border-base-300 hover:border-base-content/30 shadow-xs'
               }`}
             >
-              <div className="flex items-start justify-between w-full">
-                <div className="text-sm font-extrabold text-base-content">
+              <div className="flex items-start justify-between w-full min-w-0 gap-1">
+                <div className="text-sm font-extrabold text-base-content break-words leading-tight">
                   {variant.name.split(' ')[0]} {variant.name.split(' ')[1]} {variant.name.split(' ')[2]}
                 </div>
 
                 {isSelected && (
-                  <span className="badge badge-primary badge-xs p-1">
+                  <span className="badge badge-primary badge-xs p-1 shrink-0">
                     <Check className="w-2.5 h-2.5 stroke-[3]" />
                   </span>
                 )}

@@ -31,7 +31,7 @@ export const ColorPicker: React.FC<ColorPickerProps> = ({
   const [isCustomExpanded, setIsCustomExpanded] = useState<boolean>(isCustom);
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 w-full max-w-full overflow-hidden">
       {/* base canopy color options */}
       <div className="space-y-2">
         <div className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-base-content/70">
@@ -152,7 +152,7 @@ export const ColorPicker: React.FC<ColorPickerProps> = ({
                   <HexColorPicker
                     color={selectedColor}
                     onChange={onSelectColor}
-                    style={{ width: '100%', height: '160px' }}
+                    style={{ width: '100%', maxWidth: '100%', height: '160px' }}
                   />
                 </div>
                 <div className="w-full flex items-center justify-between gap-2 pt-1">

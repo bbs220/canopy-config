@@ -349,7 +349,7 @@ export const FaceEditor2D: React.FC<FaceEditor2DProps> = ({
   };
 
   return (
-    <div className="card bg-base-200/50 border border-base-300 p-3 space-y-3">
+    <div className="card bg-base-200/50 border border-base-300 p-3 space-y-3 w-full max-w-full overflow-hidden">
       {/* section header and toolbar */}
       <div className="flex items-center justify-between">
         <div>
@@ -399,7 +399,7 @@ export const FaceEditor2D: React.FC<FaceEditor2DProps> = ({
       </div>
 
       {/* twod canvas stage */}
-      <div className="relative flex items-center justify-center p-3 bg-base-300/60 rounded-xl overflow-hidden border border-base-300">
+      <div className="relative flex items-center justify-center p-3 bg-base-300/60 rounded-xl overflow-hidden border border-base-300 w-full max-w-full">
         <canvas
           ref={canvasRef}
           width={canvasWidth}
@@ -407,7 +407,7 @@ export const FaceEditor2D: React.FC<FaceEditor2DProps> = ({
           onMouseDown={handleCanvasMouseDown}
           onMouseMove={handleCanvasMouseMove}
           onMouseUp={handleCanvasMouseUp}
-          className="max-w-full max-h-56 shadow-lg rounded-lg cursor-move border border-black/10"
+          className="max-w-full max-h-56 shadow-lg rounded-lg cursor-move border border-black/10 w-auto object-contain block"
         />
       </div>
 
@@ -590,7 +590,7 @@ export const FaceEditor2D: React.FC<FaceEditor2DProps> = ({
       ) : (
         /* layer list selection pills */
         layers.length > 0 && (
-          <div className="flex items-center gap-1.5 flex-wrap">
+          <div className="flex items-center gap-1.5 flex-wrap w-full max-w-full overflow-hidden">
             <span className="text-[10px] uppercase font-bold text-base-content/50">Select Layer:</span>
             {layers.map((l, idx) => (
               <button

@@ -6,10 +6,10 @@ import { Toaster } from "react-hot-toast";
 
 function RootLayout() {
   return (
-    <>
+    <div className="w-full max-w-full min-h-screen overflow-x-hidden">
       <Toaster position="top-center" />
       <Outlet />
-    </>
+    </div>
   );
 }
 

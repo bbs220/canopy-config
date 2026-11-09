@@ -17,7 +17,7 @@ export const HardwareSelector: React.FC<HardwareSelectorProps> = ({
   const accessoryOptions = options.filter((o) => o.category === 'accessory');
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 w-full max-w-full">
       {/* frame selection */}
       <div className="space-y-2">
         <div className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-base-content/70">
