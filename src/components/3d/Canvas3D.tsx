@@ -69,18 +69,22 @@ function TentModel({
         mesh.castShadow = true;
         mesh.receiveShadow = true;
 
-        if (
-          mesh.name.toLowerCase().includes('fabric') ||
-          (mesh.material && (mesh.material as THREE.Material).name === 'fabric_Mat')
-        ) {
-          if (mesh.material && !Array.isArray(mesh.material)) {
-            const mat = (mesh.material as THREE.MeshStandardMaterial).clone();
-            mat.color.set(baseColor);
-            mat.roughness = roughness;
-            mat.metalness = metalness;
-            fabricMaterialRef.current = mat;
-            mesh.material = mat;
+        const isFabricMat =
+          mesh.material &&
+          !Array.isArray(mesh.material) &&
+          (mesh.material as THREE.Material).name === 'fabric_Mat';
+
+        if (isFabricMat) {
+          const mat = (mesh.material as THREE.MeshStandardMaterial).clone();
+          mat.color.set(baseColor);
+          mat.roughness = roughness;
+          mat.metalness = metalness;
+          if (canvasTextureRef.current) {
+            mat.map = canvasTextureRef.current;
+            mat.needsUpdate = true;
           }
+          fabricMaterialRef.current = mat;
+          mesh.material = mat;
         }
       }
     });
@@ -90,22 +94,25 @@ function TentModel({
 
   // update canvas texture on fabric material
   useEffect(() => {
-    if (!fabricTextureCanvas || !fabricMaterialRef.current) return;
+    if (!fabricMaterialRef.current) return;
 
-    if (!canvasTextureRef.current) {
-      const texture = new THREE.CanvasTexture(fabricTextureCanvas);
-      texture.colorSpace = THREE.SRGBColorSpace;
-      texture.flipY = false;
-      texture.generateMipmaps = true;
-      texture.minFilter = THREE.LinearMipmapLinearFilter;
-      texture.magFilter = THREE.LinearFilter;
-      canvasTextureRef.current = texture;
-      fabricMaterialRef.current.map = texture;
-    } else {
-      canvasTextureRef.current.needsUpdate = true;
+    if (fabricTextureCanvas) {
+      if (!canvasTextureRef.current) {
+        const texture = new THREE.CanvasTexture(fabricTextureCanvas);
+        texture.colorSpace = THREE.SRGBColorSpace;
+        texture.flipY = false;
+        texture.generateMipmaps = true;
+        texture.minFilter = THREE.LinearMipmapLinearFilter;
+        texture.magFilter = THREE.LinearFilter;
+        canvasTextureRef.current = texture;
+      } else {
+        canvasTextureRef.current.image = fabricTextureCanvas;
+        canvasTextureRef.current.needsUpdate = true;
+      }
+      fabricMaterialRef.current.map = canvasTextureRef.current;
+      fabricMaterialRef.current.needsUpdate = true;
     }
-    fabricMaterialRef.current.needsUpdate = true;
-  }, [fabricTextureCanvas]);
+  }, [fabricTextureCanvas, clonedScene]);
 
   // update base color
   useEffect(() => {

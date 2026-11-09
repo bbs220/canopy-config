@@ -1,22 +1,22 @@
-import { useState, useEffect, useRef, useCallback } from 'react';
-import { useConfiguratorStore } from '../store/useConfiguratorStore';
-import { Canvas3D, type Canvas3DRef } from '../components/3d/Canvas3D';
-import { VariantPicker } from '../components/ui/VariantPicker';
-import { ColorPicker } from '../components/ui/ColorPicker';
-import { HardwareSelector } from '../components/ui/HardwareSelector';
-import { SectionTabs } from '../components/ui/SectionTabs';
-import { FaceEditor2D } from '../components/2d/FaceEditor2D';
-import { PriceActionBar } from '../components/ui/PriceActionBar';
-import { ShopifyPayloadModal } from '../components/ui/ShopifyPayloadModal';
-import { ThemeToggle } from '../components/ui/ThemeToggle';
-import { ShopifyService } from '../services/shopifyService';
-import { PDFService } from '../services/pdfService';
-import { TextureAtlasEngine } from '../utils/textureAtlas';
-import type { ShopifyCartPayload } from '../types/configurator';
-import { toast } from 'react-hot-toast';
-import confetti from 'canvas-confetti';
-import { ShieldCheck, LayoutTemplate } from 'lucide-react';
-import { useNavigate } from 'react-router';
+import { useState, useEffect, useRef, useCallback } from "react";
+import { useConfiguratorStore } from "../store/useConfiguratorStore";
+import { Canvas3D, type Canvas3DRef } from "../components/3d/Canvas3D";
+import { VariantPicker } from "../components/ui/VariantPicker";
+import { ColorPicker } from "../components/ui/ColorPicker";
+import { HardwareSelector } from "../components/ui/HardwareSelector";
+import { SectionTabs } from "../components/ui/SectionTabs";
+import { FaceEditor2D } from "../components/2d/FaceEditor2D";
+import { PriceActionBar } from "../components/ui/PriceActionBar";
+import { ShopifyPayloadModal } from "../components/ui/ShopifyPayloadModal";
+import { ThemeToggle } from "../components/ui/ThemeToggle";
+import { ShopifyService } from "../services/shopifyService";
+import { PDFService } from "../services/pdfService";
+import { TextureAtlasEngine } from "../utils/textureAtlas";
+import type { ShopifyCartPayload } from "../types/configurator";
+import { toast } from "react-hot-toast";
+import confetti from "canvas-confetti";
+import { ShieldCheck, LayoutTemplate } from "lucide-react";
+import { useNavigate } from "react-router";
 
 type ConfiguratorPageProps = {
   isEmbed?: boolean;
@@ -45,12 +45,19 @@ export function ConfiguratorPage({ isEmbed = false }: ConfiguratorPageProps) {
     getConfiguration,
   } = useConfiguratorStore();
 
-  const [activeTab, setActiveTab] = useState<'size' | 'color' | 'print' | 'hardware'>('print');
-  const [shopifyModalPayload, setShopifyModalPayload] = useState<ShopifyCartPayload | null>(null);
+  const [activeTab, setActiveTab] = useState<
+    "size" | "color" | "print" | "hardware"
+  >("print");
+  const [shopifyModalPayload, setShopifyModalPayload] =
+    useState<ShopifyCartPayload | null>(null);
   const [isGeneratingPDF, setIsGeneratingPDF] = useState<boolean>(false);
 
-  const currentVariant = product.variants.find((v) => v.id === selectedVariantId) || product.variants[0];
-  const activeSection = product.sections.find((s) => s.id === activeSectionId) || product.sections[0];
+  const currentVariant =
+    product.variants.find((v) => v.id === selectedVariantId) ||
+    product.variants[0];
+  const activeSection =
+    product.sections.find((s) => s.id === activeSectionId) ||
+    product.sections[0];
 
   // texture atlas bake and threed webgl synchronization
   const bakeDebounceTimerRef = useRef<number | null>(null);
@@ -65,21 +72,21 @@ export function ConfiguratorPage({ isEmbed = false }: ConfiguratorPageProps) {
         const atlasCanvas = await atlasEngineRef.current.bakeAtlas(
           product.sections,
           sections,
-          baseColor
+          baseColor,
         );
         if (canvas3DRef.current) {
           canvas3DRef.current.updateFabricTexture(atlasCanvas);
           canvas3DRef.current.updateBaseColor(baseColor);
         }
       } catch (err) {
-        console.error('Failed to bake texture atlas:', err);
+        console.error("Failed to bake texture atlas:", err);
       }
     }, 40);
   }, [sections, baseColor, product.sections]);
 
   useEffect(() => {
     triggerTextureBake();
-  }, [triggerTextureBake]);
+  }, [triggerTextureBake, selectedVariantId]);
 
   // add to cart action
   const handleAddToCart = async () => {
@@ -87,53 +94,60 @@ export function ConfiguratorPage({ isEmbed = false }: ConfiguratorPageProps) {
       particleCount: 80,
       spread: 70,
       origin: { y: 0.8 },
-      colors: ['#2563EB', '#10B981', '#F59E0B', '#8B5CF6'],
+      colors: ["#2563EB", "#10B981", "#F59E0B", "#8B5CF6"],
     });
 
     const config = getConfiguration();
 
-    let thumbnail = '';
+    let thumbnail = "";
     if (canvas3DRef.current) {
-      thumbnail = await canvas3DRef.current.takeSnapshot('isometric');
+      thumbnail = await canvas3DRef.current.takeSnapshot("isometric");
     }
 
-    const payload = ShopifyService.buildCartPayload(config, product, pricing, thumbnail);
+    const payload = ShopifyService.buildCartPayload(
+      config,
+      product,
+      pricing,
+      thumbnail,
+    );
     ShopifyService.dispatchToHostStore(payload);
 
     setShopifyModalPayload(payload);
-    toast.success('Configuration added to Shopify Cart!');
+    toast.success("Configuration added to Shopify Cart!");
   };
 
   // download pdf production summary
   const handleDownloadPDF = async () => {
     if (!canvas3DRef.current) return;
     setIsGeneratingPDF(true);
-    toast.loading('Capturing multi-angle 3D renders & generating proof...', { id: 'pdf-toast' });
+    toast.loading("Capturing multi-angle 3D renders & generating proof...", {
+      id: "pdf-toast",
+    });
 
     try {
-      const isometric = await canvas3DRef.current.takeSnapshot('isometric');
-      const front = await canvas3DRef.current.takeSnapshot('front');
-      const back = await canvas3DRef.current.takeSnapshot('back');
+      const isometric = await canvas3DRef.current.takeSnapshot("isometric");
+      const front = await canvas3DRef.current.takeSnapshot("front");
+      const back = await canvas3DRef.current.takeSnapshot("back");
 
       const config = getConfiguration();
       const pdfBlob = await PDFService.generateProductionSummary(
         config,
         product,
         pricing,
-        { isometric, front, back }
+        { isometric, front, back },
       );
 
       const url = URL.createObjectURL(pdfBlob);
-      const link = document.createElement('a');
+      const link = document.createElement("a");
       link.href = url;
       link.download = `Canopy_Tent_Proof_${currentVariant.id.toUpperCase()}_${Date.now()}.pdf`;
       link.click();
       URL.revokeObjectURL(url);
 
-      toast.success('Production PDF downloaded!', { id: 'pdf-toast' });
+      toast.success("Production PDF downloaded!", { id: "pdf-toast" });
     } catch (err) {
-      console.error('PDF Generation failed:', err);
-      toast.error('Failed to generate PDF', { id: 'pdf-toast' });
+      console.error("PDF Generation failed:", err);
+      toast.error("Failed to generate PDF", { id: "pdf-toast" });
     } finally {
       setIsGeneratingPDF(false);
     }
@@ -166,7 +180,7 @@ export function ConfiguratorPage({ isEmbed = false }: ConfiguratorPageProps) {
 
             {/* shopify iframe preview route button */}
             <button
-              onClick={() => navigate('/shopify-preview')}
+              onClick={() => navigate("/shopify-preview")}
               className="btn btn-outline btn-primary btn-sm gap-1.5 text-xs font-semibold"
               title="Preview inside a mock Shopify storefront via <iframe>"
             >
@@ -190,31 +204,31 @@ export function ConfiguratorPage({ isEmbed = false }: ConfiguratorPageProps) {
         </div>
 
         {/* right customization drawer with daisyui card tabs */}
-        <div className="w-full lg:w-[480px] xl:w-[520px] bg-base-100 border-l border-base-300 flex flex-col shrink-0 h-1/2 lg:h-full overflow-hidden shadow-xl z-20">
+        <div className="w-full lg:w-120 xl:w-130 bg-base-100 border-l border-base-300 flex flex-col shrink-0 h-1/2 lg:h-full overflow-hidden shadow-xl z-20">
           {/* daisyui tabs header */}
           <div className="p-2 border-b border-base-300 bg-base-200/50 shrink-0">
             <div className="tabs tabs-box w-full grid grid-cols-4">
               <button
-                onClick={() => setActiveTab('print')}
-                className={`tab tab-sm font-bold text-xs ${activeTab === 'print' ? 'tab-active' : ''}`}
+                onClick={() => setActiveTab("print")}
+                className={`tab tab-sm font-bold text-xs ${activeTab === "print" ? "tab-active" : ""}`}
               >
                 1. Artwork
               </button>
               <button
-                onClick={() => setActiveTab('size')}
-                className={`tab tab-sm font-bold text-xs ${activeTab === 'size' ? 'tab-active' : ''}`}
+                onClick={() => setActiveTab("size")}
+                className={`tab tab-sm font-bold text-xs ${activeTab === "size" ? "tab-active" : ""}`}
               >
                 2. Size
               </button>
               <button
-                onClick={() => setActiveTab('color')}
-                className={`tab tab-sm font-bold text-xs ${activeTab === 'color' ? 'tab-active' : ''}`}
+                onClick={() => setActiveTab("color")}
+                className={`tab tab-sm font-bold text-xs ${activeTab === "color" ? "tab-active" : ""}`}
               >
                 3. Color
               </button>
               <button
-                onClick={() => setActiveTab('hardware')}
-                className={`tab tab-sm font-bold text-xs ${activeTab === 'hardware' ? 'tab-active' : ''}`}
+                onClick={() => setActiveTab("hardware")}
+                className={`tab tab-sm font-bold text-xs ${activeTab === "hardware" ? "tab-active" : ""}`}
               >
                 4. Hardware
               </button>
@@ -223,7 +237,7 @@ export function ConfiguratorPage({ isEmbed = false }: ConfiguratorPageProps) {
 
           {/* active tab content panel */}
           <div className="flex-1 overflow-y-auto p-4 space-y-5">
-            {activeTab === 'print' && (
+            {activeTab === "print" && (
               <div className="space-y-4">
                 <SectionTabs
                   sections={product.sections}
@@ -240,23 +254,27 @@ export function ConfiguratorPage({ isEmbed = false }: ConfiguratorPageProps) {
                   section={activeSection}
                   customization={sections[activeSection.id]}
                   baseColor={baseColor}
-                  onUpdateCustomization={(c) => updateSectionCustomization(activeSection.id, c)}
+                  onUpdateCustomization={(c) =>
+                    updateSectionCustomization(activeSection.id, c)
+                  }
                 />
               </div>
             )}
 
-            {activeTab === 'size' && (
+            {activeTab === "size" && (
               <VariantPicker
                 variants={product.variants}
                 selectedVariantId={selectedVariantId}
                 onSelectVariant={(id) => {
                   setVariant(id);
-                  toast.success(`Switched to ${product.variants.find((v) => v.id === id)?.name}`);
+                  toast.success(
+                    `Switched to ${product.variants.find((v) => v.id === id)?.name}`,
+                  );
                 }}
               />
             )}
 
-            {activeTab === 'color' && (
+            {activeTab === "color" && (
               <ColorPicker
                 colors={product.availableColors}
                 selectedColor={baseColor}
@@ -264,7 +282,7 @@ export function ConfiguratorPage({ isEmbed = false }: ConfiguratorPageProps) {
               />
             )}
 
-            {activeTab === 'hardware' && (
+            {activeTab === "hardware" && (
               <HardwareSelector
                 options={product.hardwareOptions}
                 selectedIds={selectedHardwareIds}

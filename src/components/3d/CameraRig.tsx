@@ -1,5 +1,6 @@
 import { useRef, useImperativeHandle, forwardRef, useCallback } from 'react';
-import { useThree } from '@react-three/fiber';
+import * as THREE from 'three';
+import { useThree, useFrame } from '@react-three/fiber';
 import { PerspectiveCamera, OrbitControls } from '@react-three/drei';
 import type { OrbitControls as OrbitControlsImpl } from 'three-stdlib';
 import type { CameraPreset } from './ViewControls';
@@ -17,6 +18,16 @@ type CameraRigProps = {
   isAutoRotating: boolean;
   autoRotateSpeed: number;
 };
+
+// pan limits boundary to keep camera centered around model
+const PAN_LIMITS = {
+  x: 2.0,
+  y: 1.2,
+  z: 1.5,
+};
+
+// scene center target coordinates
+const SCENE_CENTER: [number, number, number] = [0, 1.2, 0];
 
 const PRESET_CAMERA_VIEWS: Record<
   CameraPreset,
@@ -38,6 +49,42 @@ export const CameraRig = forwardRef<CameraRigRef, CameraRigProps>(({
   const controlsRef = useRef<OrbitControlsImpl | null>(null);
 
   useGSAP();
+
+  // clamp orbit controls pan target within bounding boundaries
+  useFrame((state) => {
+    if (!controlsRef.current) return;
+
+    const currentX = controlsRef.current.target.x;
+    const currentY = controlsRef.current.target.y;
+    const currentZ = controlsRef.current.target.z;
+
+    const clampedX = THREE.MathUtils.clamp(
+      currentX,
+      SCENE_CENTER[0] - PAN_LIMITS.x,
+      SCENE_CENTER[0] + PAN_LIMITS.x,
+    );
+    const clampedY = THREE.MathUtils.clamp(
+      currentY,
+      SCENE_CENTER[1] - PAN_LIMITS.y,
+      SCENE_CENTER[1] + PAN_LIMITS.y,
+    );
+    const clampedZ = THREE.MathUtils.clamp(
+      currentZ,
+      SCENE_CENTER[2] - PAN_LIMITS.z,
+      SCENE_CENTER[2] + PAN_LIMITS.z,
+    );
+
+    const diffX = clampedX - currentX;
+    const diffY = clampedY - currentY;
+    const diffZ = clampedZ - currentZ;
+
+    if (diffX !== 0 || diffY !== 0 || diffZ !== 0) {
+      controlsRef.current.target.set(clampedX, clampedY, clampedZ);
+      state.camera.position.x += diffX;
+      state.camera.position.y += diffY;
+      state.camera.position.z += diffZ;
+    }
+  });
 
   const focusSection = useCallback((sectionId: string) => {
     const section = TENT_PRODUCT.sections.find((s) => s.id === sectionId);

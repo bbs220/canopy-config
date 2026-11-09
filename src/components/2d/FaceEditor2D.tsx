@@ -311,14 +311,15 @@ export const FaceEditor2D: React.FC<FaceEditor2DProps> = ({
           onMouseUp={handleCanvasMouseUp}
           className="max-w-full max-h-56 shadow-lg rounded-lg cursor-move border border-black/10"
         />
-
-        {layers.length === 0 && (
-          <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none text-base-content/40 gap-1">
-            <Sparkles className="w-5 h-5 text-primary/40" />
-            <span className="text-xs font-medium">Click "Add Text" or "Upload Logo" to design this face</span>
-          </div>
-        )}
       </div>
+
+      {/* empty layer design instruction */}
+      {layers.length === 0 && (
+        <div className="flex items-center justify-center gap-1.5 text-xs text-base-content/60 py-1 select-none">
+          <Sparkles className="w-3.5 h-3.5 text-primary/60" />
+          <span>Click Add Text or Upload Logo to design this face</span>
+        </div>
+      )}
 
       {/* selected layer customization controls */}
       {selectedLayer ? (
