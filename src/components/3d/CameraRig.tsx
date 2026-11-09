@@ -53,7 +53,7 @@ export const CameraRig = ({
       folder: "5x5 Tent",
     },
     zoom5x5: {
-      value: 1.0,
+      value: 0.7,
       min: 0.5,
       max: 3.0,
       step: 0.05,
@@ -61,7 +61,7 @@ export const CameraRig = ({
       folder: "5x5 Tent",
     },
     minDist5x5: {
-      value: 1.2,
+      value: 1.6,
       min: 0.5,
       max: 5.0,
       step: 0.1,
@@ -69,7 +69,7 @@ export const CameraRig = ({
       folder: "5x5 Tent",
     },
     maxDist5x5: {
-      value: 7.0,
+      value: 10.0,
       min: 2.0,
       max: 20.0,
       step: 0.5,
@@ -85,7 +85,7 @@ export const CameraRig = ({
       folder: "5x5 Tent",
     },
     posX5x5: {
-      value: 3.0,
+      value: 0,
       min: -10.0,
       max: 10.0,
       step: 0.1,
@@ -150,7 +150,7 @@ export const CameraRig = ({
       folder: "6.5x6.5 Tent",
     },
     posX6x5: {
-      value: 3.5,
+      value: 0,
       min: -10.0,
       max: 10.0,
       step: 0.1,
@@ -215,7 +215,7 @@ export const CameraRig = ({
       folder: "8x8 Tent",
     },
     posX8x8: {
-      value: 4.2,
+      value: 0,
       min: -10.0,
       max: 10.0,
       step: 0.1,
@@ -289,7 +289,7 @@ export const CameraRig = ({
         target: [0, targetY, 0],
       },
       front: {
-        position: [0, posY * 0.5, posZ],
+        position: [posX, posY, posZ],
         target: [0, targetY, 0],
       },
       right: {
@@ -363,6 +363,7 @@ export const CameraRig = ({
       presetViews.front.position[1],
       presetViews.front.position[2],
     );
+    camera.lookAt(0, activeConfig.targetY, 0);
     if (controlsRef.current) {
       controlsRef.current.target.set(0, activeConfig.targetY, 0);
       controlsRef.current.update();
@@ -454,6 +455,13 @@ export const CameraRig = ({
   useEffect(() => {
     setResetCameraHandler(() => {
       setCameraPreset("front");
+      console.log(`[Reset Camera - ${selectedVariantId}]`);
+      console.log(`  position: [${presetViews.front.position.join(", ")}]`);
+      console.log(`  target: [0, ${activeConfig.targetY}, 0]`);
+      console.log(`  fov: ${activeConfig.fov}, zoom: ${activeConfig.zoom}`);
+      console.log(
+        `  minDistance: ${activeConfig.minDistance}, maxDistance: ${activeConfig.maxDistance}`,
+      );
     });
     setSnapshotHandler(takeSnapshot);
   }, [
@@ -461,9 +469,20 @@ export const CameraRig = ({
     setSnapshotHandler,
     setCameraPreset,
     takeSnapshot,
+    selectedVariantId,
+    presetViews.front.position,
+    activeConfig,
   ]);
 
+  const isInitialMount = useRef<boolean>(true);
+
+  // skip initial mount so spawn position matches reset camera position
   useEffect(() => {
+    if (isInitialMount.current) {
+      isInitialMount.current = false;
+      return;
+    }
+
     if (activeSectionId) {
       setIsAutoRotating(false);
       focusSection(activeSectionId);
