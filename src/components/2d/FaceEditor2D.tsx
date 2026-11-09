@@ -13,6 +13,8 @@ import {
   ArrowUp,
   ArrowDown,
   Sparkles,
+  Check,
+  Pencil,
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 
@@ -295,9 +297,10 @@ export const FaceEditor2D: React.FC<FaceEditor2DProps> = ({
   };
 
   // move layer order
-  const handleMoveLayer = (direction: 'up' | 'down') => {
-    if (!selectedLayerId) return;
-    const index = layers.findIndex((l) => l.id === selectedLayerId);
+  const handleMoveLayer = (direction: 'up' | 'down', layerId?: string) => {
+    const id = layerId || selectedLayerId;
+    if (!id) return;
+    const index = layers.findIndex((l) => l.id === id);
     if (index === -1) return;
 
     const targetIndex = direction === 'up' ? index + 1 : index - 1;
@@ -412,12 +415,12 @@ export const FaceEditor2D: React.FC<FaceEditor2DProps> = ({
       {selectedLayer ? (
         <div className="card bg-base-100 p-3 border border-base-300 space-y-3">
           <div className="flex items-center justify-between text-xs font-bold text-base-content border-b border-base-200 pb-2">
-            <div className="flex items-center gap-1.5">
-              <Layers className="w-3.5 h-3.5 text-primary" />
-              <span>Editing: {selectedLayer.type === 'text' ? (selectedLayer as TextLayer).text : (selectedLayer as ImageLayer).fileName}</span>
+            <div className="flex items-center gap-1.5 min-w-0">
+              <Layers className="w-3.5 h-3.5 text-primary shrink-0" />
+              <span className="truncate">Editing: {selectedLayer.type === 'text' ? (selectedLayer as TextLayer).text : (selectedLayer as ImageLayer).fileName}</span>
             </div>
 
-            <div className="flex items-center gap-1">
+            <div className="flex items-center gap-1 shrink-0">
               <button
                 onClick={() => handleMoveLayer('up')}
                 className="btn btn-ghost btn-xs"
@@ -438,6 +441,14 @@ export const FaceEditor2D: React.FC<FaceEditor2DProps> = ({
                 title="Delete Layer"
               >
                 <Trash2 className="w-3.5 h-3.5" />
+              </button>
+              <button
+                onClick={() => setSelectedLayerId(null)}
+                className="btn btn-xs btn-primary gap-1 font-bold ml-1"
+                title="Done editing layer"
+              >
+                <Check className="w-3 h-3" />
+                <span>Done</span>
               </button>
             </div>
           </div>
@@ -575,21 +586,103 @@ export const FaceEditor2D: React.FC<FaceEditor2DProps> = ({
               />
             </div>
           </div>
+
+          {/* done editing action button */}
+          <button
+            onClick={() => setSelectedLayerId(null)}
+            className="btn btn-sm btn-outline btn-primary w-full gap-1.5 mt-2 font-bold"
+          >
+            <Check className="w-4 h-4" />
+            <span>Done Editing Layer</span>
+          </button>
         </div>
       ) : (
         /* layer list selection pills */
         layers.length > 0 && (
-          <div className="flex items-center gap-1.5 flex-wrap w-full max-w-full overflow-hidden">
-            <span className="text-[10px] uppercase font-bold text-base-content/50">Select Layer:</span>
-            {layers.map((l, idx) => (
-              <button
-                key={l.id}
-                onClick={() => setSelectedLayerId(l.id)}
-                className="badge badge-outline hover:badge-primary text-xs cursor-pointer py-2"
-              >
-                {l.type === 'text' ? `Text: "${(l as TextLayer).text.substring(0, 10)}..."` : `Logo ${idx + 1}`}
-              </button>
-            ))}
+          <div className="card bg-base-100 p-3 border border-base-300 space-y-2.5">
+            <div className="flex items-center justify-between text-xs font-bold text-base-content border-b border-base-200 pb-2">
+              <div className="flex items-center gap-1.5">
+                <Layers className="w-3.5 h-3.5 text-primary" />
+                <span>Custom Layers ({layers.length})</span>
+              </div>
+              <span className="text-[10px] text-base-content/60 font-normal">
+                Click any layer to edit
+              </span>
+            </div>
+
+            <div className="space-y-1.5 max-h-56 overflow-y-auto pr-0.5">
+              {layers.map((l, idx) => {
+                const isText = l.type === 'text';
+                const textLayer = isText ? (l as TextLayer) : null;
+                const imageLayer = !isText ? (l as ImageLayer) : null;
+
+                return (
+                  /* individual layer row item */
+                  <div
+                    key={l.id}
+                    className="flex items-center justify-between gap-2 p-2 rounded-lg bg-base-200/60 hover:bg-base-200 transition-colors border border-base-300/50 cursor-pointer group"
+                    onClick={() => setSelectedLayerId(l.id)}
+                  >
+                    <div className="flex items-center gap-2 min-w-0">
+                      <div className="w-7 h-7 rounded bg-base-300/80 flex items-center justify-center shrink-0">
+                        {isText ? (
+                          <Type className="w-3.5 h-3.5 text-primary" />
+                        ) : (
+                          <ImageIcon className="w-3.5 h-3.5 text-secondary" />
+                        )}
+                      </div>
+                      <div className="min-w-0">
+                        <p className="text-xs font-semibold text-base-content truncate">
+                          {isText ? `"${textLayer?.text}"` : (imageLayer?.fileName || `Logo ${idx + 1}`)}
+                        </p>
+                        <p className="text-[10px] text-base-content/60 truncate">
+                          {isText
+                            ? `${textLayer?.fontFamily?.split(',')[0]} • ${textLayer?.fontSize}px`
+                            : `Scale ${Math.round((imageLayer?.scale || 1) * 100)}% • ${imageLayer?.rotation || 0}°`}
+                        </p>
+                      </div>
+                    </div>
+
+                    <div
+                      className="flex items-center gap-1 shrink-0"
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      <button
+                        onClick={() => handleMoveLayer('up', l.id)}
+                        disabled={idx === layers.length - 1}
+                        className="btn btn-ghost btn-xs px-1 text-base-content/70 hover:text-base-content disabled:opacity-30"
+                        title="Bring Forward"
+                      >
+                        <ArrowUp className="w-3.5 h-3.5" />
+                      </button>
+                      <button
+                        onClick={() => handleMoveLayer('down', l.id)}
+                        disabled={idx === 0}
+                        className="btn btn-ghost btn-xs px-1 text-base-content/70 hover:text-base-content disabled:opacity-30"
+                        title="Send Backward"
+                      >
+                        <ArrowDown className="w-3.5 h-3.5" />
+                      </button>
+                      <button
+                        onClick={() => setSelectedLayerId(l.id)}
+                        className="btn btn-xs btn-outline btn-primary gap-1 font-semibold px-2"
+                        title="Edit Layer"
+                      >
+                        <Pencil className="w-3 h-3" />
+                        <span>Edit</span>
+                      </button>
+                      <button
+                        onClick={() => handleDeleteLayer(l.id)}
+                        className="btn btn-ghost btn-xs px-1 text-error hover:bg-error/10"
+                        title="Delete Layer"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
           </div>
         )
       )}
