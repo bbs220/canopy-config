@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import { persist } from 'zustand/middleware';
 
 export type DaisyTheme = 'light' | 'dark';
 
@@ -8,31 +9,29 @@ interface ThemeState {
   toggleTheme: () => void;
 }
 
-const getInitialTheme = (): DaisyTheme => {
-  if (typeof window !== 'undefined') {
-    const saved = localStorage.getItem('daisy-theme') as DaisyTheme;
-    if (saved === 'dark' || saved === 'light') {
-      document.documentElement.setAttribute('data-theme', saved);
-      return saved;
+export const useThemeStore = create<ThemeState>()(
+  persist(
+    (set, get) => ({
+      theme: 'light',
+
+      setTheme: (theme: DaisyTheme) => {
+        document.documentElement.setAttribute('data-theme', theme);
+        set({ theme });
+      },
+
+      toggleTheme: () => {
+        const nextTheme: DaisyTheme = get().theme === 'light' ? 'dark' : 'light';
+        document.documentElement.setAttribute('data-theme', nextTheme);
+        set({ theme: nextTheme });
+      },
+    }),
+    {
+      name: 'daisy-theme',
+      onRehydrateStorage: () => (state) => {
+        if (state?.theme) {
+          document.documentElement.setAttribute('data-theme', state.theme);
+        }
+      },
     }
-    document.documentElement.setAttribute('data-theme', 'light');
-  }
-  return 'light';
-};
-
-export const useThemeStore = create<ThemeState>((set, get) => ({
-  theme: getInitialTheme(),
-
-  setTheme: (theme: DaisyTheme) => {
-    if (typeof window !== 'undefined') {
-      document.documentElement.setAttribute('data-theme', theme);
-      localStorage.setItem('daisy-theme', theme);
-    }
-    set({ theme });
-  },
-
-  toggleTheme: () => {
-    const nextTheme: DaisyTheme = get().theme === 'light' ? 'dark' : 'light';
-    get().setTheme(nextTheme);
-  },
-}));
+  )
+);
