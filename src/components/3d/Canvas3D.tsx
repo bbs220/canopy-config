@@ -223,7 +223,7 @@ export const PrimaryScene = () => {
         <CameraRig autoRotateSpeed={autoRotateSpeed} />
 
         <GizmoHelper
-          renderPriority={2}
+          renderPriority={1}
           alignment="top-left"
           margin={[160, 289]}
           visible={showGizmo}
