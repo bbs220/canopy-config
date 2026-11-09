@@ -188,14 +188,14 @@ export const FaceEditor2D: React.FC<FaceEditor2DProps> = ({
       ctx.lineTo(width, height);
       ctx.stroke();
 
-      ctx.font = 'bold 10px Inter, sans-serif';
+      ctx.font = 'bold 9px Inter, sans-serif';
       ctx.fillStyle = 'rgba(255, 255, 255, 0.7)';
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
       ctx.shadowColor = 'transparent';
       ctx.shadowBlur = 0;
-      ctx.fillText('CLIPPED AREA', width * 0.16, height * 0.35);
-      ctx.fillText('CLIPPED AREA', width * 0.84, height * 0.35);
+      ctx.fillText('CLIPPED', width * 0.16, height * 0.35);
+      ctx.fillText('CLIPPED', width * 0.84, height * 0.35);
 
       ctx.fillStyle = '#F59E0B';
       ctx.beginPath();
@@ -204,10 +204,6 @@ export const FaceEditor2D: React.FC<FaceEditor2DProps> = ({
       ctx.font = 'bold 9px Inter, sans-serif';
       ctx.fillStyle = 'rgba(255, 255, 255, 0.85)';
       ctx.fillText('APEX', apexX, 16);
-
-      ctx.font = '9px Inter, sans-serif';
-      ctx.fillStyle = 'rgba(255, 255, 255, 0.45)';
-      ctx.fillText('PRINTABLE PEAK AREA', apexX, height - 8);
       ctx.restore();
     }
   }, [customization, baseColor, layers, selectedLayerId, onUpdateCustomization, section]);
@@ -351,30 +347,23 @@ export const FaceEditor2D: React.FC<FaceEditor2DProps> = ({
   return (
     <div className="card bg-base-200/50 border border-base-300 p-3 space-y-3 w-full max-w-full overflow-hidden">
       {/* section header and toolbar */}
-      <div className="flex items-center justify-between">
-        <div>
-          <div className="text-xs font-bold text-base-content flex items-center gap-1.5">
-            <span>{section.name} 2D Editor</span>
-            {section.category === 'peak' ? (
-              <span className="badge badge-warning badge-xs font-semibold">
-                Dotted Safe Zone
-              </span>
-            ) : (
-              <span className="badge badge-primary badge-xs">Live 3D Sync</span>
-            )}
-          </div>
-          <div className="text-[11px] text-base-content/60">
-            {section.category === 'peak'
-              ? 'Triangle safe print area — corners outside dotted lines are clipped'
-              : 'Eye-level perimeter skirt with matching aspect ratio'}
-          </div>
+      <div className="flex items-center justify-between gap-2">
+        <div className="flex items-center gap-1.5 min-w-0">
+          <span className="text-xs font-bold text-base-content truncate">{section.name}</span>
+          <span
+            className={`badge badge-xs font-semibold shrink-0 ${
+              section.category === 'peak' ? 'badge-warning' : 'badge-primary'
+            }`}
+          >
+            {section.category === 'peak' ? 'Safe Zone' : 'Valance'}
+          </span>
         </div>
 
         {/* action buttons using daisyui btn */}
-        <div className="flex items-center gap-1.5">
+        <div className="flex items-center gap-1.5 shrink-0">
           <button
             onClick={handleAddText}
-            className="btn btn-sm btn-outline btn-primary gap-1 text-xs"
+            className="btn btn-xs sm:btn-sm btn-outline btn-primary gap-1 font-semibold"
           >
             <Type className="w-3.5 h-3.5" />
             <span>Add Text</span>
@@ -382,7 +371,7 @@ export const FaceEditor2D: React.FC<FaceEditor2DProps> = ({
 
           <button
             onClick={() => fileInputRef.current?.click()}
-            className="btn btn-sm btn-outline btn-secondary gap-1 text-xs"
+            className="btn btn-xs sm:btn-sm btn-outline btn-secondary gap-1 font-semibold"
           >
             <ImageIcon className="w-3.5 h-3.5" />
             <span>Upload Logo</span>
