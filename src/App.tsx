@@ -1,8 +1,4 @@
-import {
-  createBrowserRouter,
-  RouterProvider,
-  Outlet,
-} from "react-router";
+import { createBrowserRouter, RouterProvider, Outlet } from "react-router";
 import { ConfiguratorPage } from "./pages/ConfiguratorPage";
 import { ShopifyStorePage } from "./pages/ShopifyStorePage";
 import { NotFoundPage } from "./pages/NotFoundPage";
