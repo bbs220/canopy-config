@@ -474,18 +474,16 @@ export const CameraRig = ({
     activeConfig,
   ]);
 
-  const isInitialMount = useRef<boolean>(true);
+  const prevSectionIdRef = useRef<string>(activeSectionId);
 
-  // skip initial mount so spawn position matches reset camera position
+  // only focus section when user changes active section
   useEffect(() => {
-    if (isInitialMount.current) {
-      isInitialMount.current = false;
-      return;
-    }
-
-    if (activeSectionId) {
-      setIsAutoRotating(false);
-      focusSection(activeSectionId);
+    if (prevSectionIdRef.current !== activeSectionId) {
+      prevSectionIdRef.current = activeSectionId;
+      if (activeSectionId) {
+        setIsAutoRotating(false);
+        focusSection(activeSectionId);
+      }
     }
   }, [activeSectionId, setIsAutoRotating, focusSection]);
 
