@@ -1,36 +1,49 @@
-import React, { useState, useEffect } from 'react';
-import { ShoppingBag, Star, ShieldCheck, Truck, ArrowLeft, RefreshCw } from 'lucide-react';
-import type { ShopifyCartPayload } from '../../types/configurator';
+import React, { useState, useEffect } from "react";
+import {
+  ShoppingBag,
+  Star,
+  ShieldCheck,
+  Truck,
+  ArrowLeft,
+  RefreshCw,
+} from "lucide-react";
+import type { ShopifyCartPayload } from "../../types/configurator";
 
 type ShopifyHostMockProps = {
   onExitIframeMode: () => void;
 };
 
-export const ShopifyHostMock: React.FC<ShopifyHostMockProps> = ({ onExitIframeMode }) => {
+export const ShopifyHostMock: React.FC<ShopifyHostMockProps> = ({
+  onExitIframeMode,
+}) => {
   const [cartCount, setCartCount] = useState<number>(0);
-  const [lastReceivedPayload, setLastReceivedPayload] = useState<ShopifyCartPayload | null>(null);
+  const [lastReceivedPayload, setLastReceivedPayload] =
+    useState<ShopifyCartPayload | null>(null);
 
   // listen for post message from the embedded configurator inside the iframe
   useEffect(() => {
     const handleMessage = (event: MessageEvent) => {
-      if (event.data && event.data.type === 'SHOPIFY_ADD_TO_CART') {
+      if (event.data && event.data.type === "SHOPIFY_ADD_TO_CART") {
         const payload = event.data.payload as ShopifyCartPayload;
         setCartCount((prev) => prev + (payload.items?.[0]?.quantity || 1));
         setLastReceivedPayload(payload);
       }
     };
 
-    window.addEventListener('message', handleMessage);
-    return () => window.removeEventListener('message', handleMessage);
+    window.addEventListener("message", handleMessage);
+    return () => window.removeEventListener("message", handleMessage);
   }, []);
 
   return (
-    <div className="min-h-screen bg-zinc-100 dark:bg-zinc-950 font-sans text-zinc-900 dark:text-zinc-100 flex flex-col">
+    <div className="min-h-dvh bg-zinc-100 dark:bg-zinc-950 font-sans text-zinc-900 dark:text-zinc-100 flex flex-col">
       {/* simulation banner */}
       <div className="bg-amber-500 text-zinc-950 px-4 py-2 text-xs font-bold flex items-center justify-between shadow-sm">
         <div className="flex items-center gap-2">
           <span className="w-2 h-2 rounded-full bg-zinc-950 animate-ping" />
-          <span>SIMULATION: Host Shopify Storefront Embedding Configurator via &lt;iframe&gt;</span>
+          <span>
+            SIMULATION: Host Shopify Storefront Embedding Configurator via
+            &lt;iframe&gt;
+          </span>
         </div>
         <button
           onClick={onExitIframeMode}
@@ -45,12 +58,16 @@ export const ShopifyHostMock: React.FC<ShopifyHostMockProps> = ({ onExitIframeMo
       <header className="bg-white dark:bg-zinc-900 border-b border-zinc-200 dark:border-zinc-800 px-6 py-4 flex items-center justify-between sticky top-0 z-40">
         <div className="flex items-center gap-8">
           <div className="font-black text-xl tracking-tight text-zinc-900 dark:text-white flex items-center gap-1.5">
-            <span className="bg-blue-600 text-white px-2 py-0.5 rounded text-sm font-bold">MVP</span>
+            <span className="bg-blue-600 text-white px-2 py-0.5 rounded text-sm font-bold">
+              MVP
+            </span>
             <span>VISUALS</span>
           </div>
 
           <nav className="hidden md:flex items-center gap-6 text-xs font-medium text-zinc-600 dark:text-zinc-400">
-            <span className="text-blue-600 font-bold border-b-2 border-blue-600 pb-1">Canopy Tents</span>
+            <span className="text-blue-600 font-bold border-b-2 border-blue-600 pb-1">
+              Canopy Tents
+            </span>
             <span>Table Covers</span>
             <span>Event Banners</span>
             <span>Inflatables</span>
@@ -74,7 +91,9 @@ export const ShopifyHostMock: React.FC<ShopifyHostMockProps> = ({ onExitIframeMo
       <main className="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 space-y-6">
         {/* breadcrumb and pdp title */}
         <div className="space-y-1">
-          <div className="text-xs text-zinc-400">Home / Commercial Canopy Tents / Custom 10x10 Series</div>
+          <div className="text-xs text-zinc-400">
+            Home / Commercial Canopy Tents / Custom 10x10 Series
+          </div>
           <h1 className="text-2xl sm:text-3xl font-extrabold text-zinc-900 dark:text-white">
             Custom Logo Canopy Tent (Interactive 3D Builder)
           </h1>
@@ -84,13 +103,15 @@ export const ShopifyHostMock: React.FC<ShopifyHostMockProps> = ({ onExitIframeMo
                 <Star key={i} className="w-3.5 h-3.5 fill-current" />
               ))}
             </div>
-            <span className="font-semibold text-zinc-800 dark:text-zinc-200">4.9 / 5.0</span>
+            <span className="font-semibold text-zinc-800 dark:text-zinc-200">
+              4.9 / 5.0
+            </span>
             <span>(218 verified commercial reviews)</span>
           </div>
         </div>
 
         {/* embedded iframe container */}
-        <div className="bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200 dark:border-zinc-800 shadow-xl overflow-hidden h-[750px] relative">
+        <div className="bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200 dark:border-zinc-800 shadow-xl overflow-hidden h-187.5 relative">
           <iframe
             src={window.location.origin}
             title="3D Configurator Embed"
@@ -103,11 +124,18 @@ export const ShopifyHostMock: React.FC<ShopifyHostMockProps> = ({ onExitIframeMo
         {lastReceivedPayload && (
           <div className="p-4 bg-emerald-50 dark:bg-emerald-950/40 rounded-xl border border-emerald-200 dark:border-emerald-800 text-xs space-y-2 animate-in fade-in">
             <div className="font-bold text-emerald-800 dark:text-emerald-300 flex items-center gap-1.5">
-              <span>✅ Shopify Host Window Received &quot;SHOPIFY_ADD_TO_CART&quot; postMessage</span>
+              <span>
+                ✅ Shopify Host Window Received &quot;SHOPIFY_ADD_TO_CART&quot;
+                postMessage
+              </span>
             </div>
             <p className="text-emerald-700 dark:text-emerald-400">
-              Parent page successfully intercepted line item properties from iframe. In production, this triggers{' '}
-              <code className="font-mono bg-white dark:bg-zinc-900 px-1 py-0.5 rounded">fetch(&apos;/cart/add.js&apos;)</code> and refreshes the cart slide-out drawer.
+              Parent page successfully intercepted line item properties from
+              iframe. In production, this triggers{" "}
+              <code className="font-mono bg-white dark:bg-zinc-900 px-1 py-0.5 rounded">
+                fetch(&apos;/cart/add.js&apos;)
+              </code>{" "}
+              and refreshes the cart slide-out drawer.
             </p>
           </div>
         )}

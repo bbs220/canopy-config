@@ -125,7 +125,7 @@ export function ConfiguratorPage({ isEmbed = false }: ConfiguratorPageProps) {
   };
 
   return (
-    <div className="flex flex-col h-screen w-full max-w-full bg-base-200 text-base-content overflow-hidden overflow-x-hidden font-sans">
+    <div className="flex flex-col h-dvh w-full max-w-full bg-base-200 text-base-content overflow-hidden overflow-x-hidden font-sans">
       {/* daisyui navbar header hidden in embed mode */}
       {!isEmbed && (
         <header className="navbar bg-base-100 border-b border-base-300 px-4 min-h-14 h-14 shrink-0 z-40 justify-between shadow-xs">
@@ -170,7 +170,7 @@ export function ConfiguratorPage({ isEmbed = false }: ConfiguratorPageProps) {
         </div>
 
         {/* right customization drawer with daisyui card tabs */}
-        <div className="w-full lg:w-[480px] xl:w-[540px] 2xl:w-[580px] bg-base-100 border-l border-base-300 flex flex-col shrink-0 h-1/2 lg:h-full overflow-hidden overflow-x-hidden shadow-xl z-20">
+        <div className="w-full lg:w-120 xl:w-135 2xl:w-145 bg-base-100 border-l border-base-300 flex flex-col shrink-0 h-1/2 lg:h-full overflow-hidden overflow-x-hidden shadow-xl z-20">
           {/* daisyui tabs header */}
           <div className="p-2 border-b border-base-300 bg-base-200/50 shrink-0">
             <div className="tabs tabs-box w-full grid grid-cols-4">

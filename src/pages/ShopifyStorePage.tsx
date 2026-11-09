@@ -32,7 +32,7 @@ export function ShopifyStorePage() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-base-200 font-sans text-base-content flex flex-col overflow-x-hidden w-full max-w-full">
+    <div className="min-h-dvh bg-base-200 font-sans text-base-content flex flex-col overflow-x-hidden w-full max-w-full">
       {/* simulation banner */}
       <div className="bg-warning text-warning-content px-4 py-2 text-xs font-bold flex items-center justify-between shadow-xs">
         <div className="flex items-center gap-2">

@@ -17,7 +17,7 @@ export const NotFoundUI: React.FC<NotFoundUIProps> = ({
   onGoShopifyPreview,
 }) => {
   return (
-    <div className="min-h-screen w-full flex items-center justify-center p-4 bg-base-100 text-base-content transition-colors select-none">
+    <div className="min-h-screen min-h-dvh w-full flex items-center justify-center p-4 bg-base-100 text-base-content transition-colors select-none">
       <div className="card w-full max-w-md bg-base-200/70 border border-base-content/10 shadow-2xl backdrop-blur-lg p-6 sm:p-8 text-center animate-fade-in">
         {/* radar compass icon with pulse effect */}
         <div className="relative mx-auto mb-5 flex h-20 w-20 items-center justify-center rounded-3xl bg-primary/10 border border-primary/20 text-primary">
