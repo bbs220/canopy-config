@@ -54,8 +54,7 @@ export const FaceEditor2D: React.FC<FaceEditor2DProps> = ({
 
   const currentTextColor =
     selectedLayer?.type === 'text'
-      ? (selectedLayer as TextLayer).color ||
-        (section.id === 'front_peak' || section.category === 'peak' ? '#000000' : '#FFFFFF')
+      ? (selectedLayer as TextLayer).color || '#000000'
       : '#000000';
 
   // canvas dimensions matching section aspect ratio
@@ -101,8 +100,7 @@ export const FaceEditor2D: React.FC<FaceEditor2DProps> = ({
         const weight = layer.isBold ? 'bold' : 'normal';
         const style = layer.isItalic ? 'italic' : 'normal';
         ctx.font = `${style} ${weight} ${fontSize}px ${layer.fontFamily || 'Inter, sans-serif'}`;
-        const defaultTextColor = section.id === 'front_peak' || section.category === 'peak' ? '#000000' : '#FFFFFF';
-        ctx.fillStyle = layer.color || defaultTextColor;
+        ctx.fillStyle = layer.color || '#000000';
         ctx.textAlign = layer.align || 'center';
         ctx.textBaseline = 'middle';
         ctx.fillText(layer.text, 0, 0);
@@ -222,14 +220,13 @@ export const FaceEditor2D: React.FC<FaceEditor2DProps> = ({
 
   // add new text layer
   const handleAddText = () => {
-    const defaultColor = section.id === 'front_peak' || section.category === 'peak' ? '#000000' : '#FFFFFF';
     const newText: TextLayer = {
       id: 'txt_' + Math.random().toString(36).substring(2, 7),
       type: 'text',
       text: 'YOUR BRAND',
       fontFamily: 'Inter, sans-serif',
       fontSize: section.category === 'valance' ? 40 : 18,
-      color: defaultColor,
+      color: '#000000',
       x: 50,
       y: 50,
       scale: 1,
