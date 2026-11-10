@@ -118,10 +118,14 @@ A central requirement is real-time visual parity between 2D customization and 3D
 ┌────────────────────────────────────────────────────────┐
 │         Master UV Composite Canvas (2048 x 2048)       │
 │   Bakes all 8 sections into GLB UV texture atlas:      │
-│   - Front Peak   -> U: [0.256, 0.745], V: [0.537, 0.969]│
-│   - Front Valance-> U: [0.257, 0.745], V: [0.919, 0.968]│
-│   - Back Peak    -> U: [0.258, 0.965], V: [0.034, 0.535]│
-│   - Right / Left Peaks & Valances                      │
+│   - Front Peak (0°)    -> U: [0.260, 0.740], V: [0.535, 0.860]│
+│   - Front Valance (0°) -> U: [0.260, 0.740], V: [0.860, 0.945]│
+│   - Right Peak (-90°)  -> U: [0.535, 0.860], V: [0.260, 0.740]│
+│   - Right Valance (-90°)-> U: [0.860, 0.945], V: [0.260, 0.740]│
+│   - Back Peak (180°)   -> U: [0.260, 0.740], V: [0.140, 0.465]│
+│   - Back Valance (180°)-> U: [0.260, 0.740], V: [0.055, 0.140]│
+│   - Left Peak (90°)    -> U: [0.140, 0.465], V: [0.260, 0.740]│
+│   - Left Valance (90°) -> U: [0.055, 0.140], V: [0.260, 0.740]│
 └───────────────────────────┬────────────────────────────┘
                             │
                             ▼ (texture.needsUpdate = true)
@@ -153,42 +157,44 @@ The architecture is built around a generic, declarative product schema. Any cust
 ```typescript
 // types/product.ts
 
-export interface UVRegion {
+export type UVRegion = {
   uMin: number;
   uMax: number;
   vMin: number;
   vMax: number;
-}
+};
 
-export interface PrintableSection {
+export type PrintableSection = {
   id: string;               // e.g., 'front_peak', 'front_valance'
   name: string;             // "Front Peak"
   category: 'peak' | 'valance' | 'wall';
   uvRegion: UVRegion;       // Mapped coordinates in texture atlas
   aspectRatio: number;      // 2D canvas aspect ratio
-  cameraTarget: {
+  rotation?: number;        // Rotation in degrees (0, 90, 180, -90)
+  cameraView: {
     position: [number, number, number];
     target: [number, number, number];
   };
-}
+  printCost: number;
+};
 
-export interface ProductVariant {
+export type ProductVariant = {
   id: string;               // "tent-5x5", "tent-8x8"
   name: string;             // "8' x 8' Commercial Tent"
   modelUrl: string;         // Path to .glb asset
   basePrice: number;
-  dimensions: { width: string; length: string; height: string };
-}
+  dimensions: { width: string; depth: string; height: string };
+};
 
-export interface ProductDefinition {
+export type ProductDefinition = {
   id: string;
   name: string;
   description: string;
   variants: ProductVariant[];
-  availableColors: { name: string; hex: string }[];
-  hardwareOptions: { id: string; name: string; price: number }[];
+  availableColors: { name: string; hex: string; pantone?: string }[];
+  hardwareOptions: { id: string; name: string; price: number; category: 'frame' | 'accessory' }[];
   sections: PrintableSection[];
-}
+};
 ```
 
 ### Customer Configuration State (Serializable JSON):
@@ -352,38 +358,46 @@ assignment_vertical_tech_3d/
 ├── public/
 │   └── models/
 │       ├── Tent_5_5.glb           # 5x5 ft Tent Model
-│       ├── Tent 6.5_6.5.glb       # 6.5x6.5 ft Tent Model
+│       ├── Tent_6_5_6_5.glb       # 6.5x6.5 ft Tent Model
 │       └── Tent_8_8.glb           # 8x8 ft Tent Model
 ├── src/
 │   ├── components/
 │   │   ├── 3d/
-│   │   │   ├── Canvas3D.tsx       # Three.js Canvas & Scene setup
-│   │   │   ├── TentModel.tsx      # GLTF loader, PBR setup & CanvasTexture
-│   │   │   ├── CameraRig.tsx      # Smooth camera preset transitions
-│   │   │   └── ViewportGizmo.tsx  # View angle preset shortcuts
+│   │   │   ├── Canvas3D.tsx       # Three.js Canvas, lighting, shadows & texture sync
+│   │   │   ├── ModelLoader.tsx    # GLTF loader, PBR material isolation & centering
+│   │   │   ├── CameraRig.tsx      # Smooth camera preset transitions & snapshot capture
+│   │   │   └── ViewControls.tsx   # View angle presets, reset camera & 360° spin
 │   │   ├── 2d/
-│   │   │   ├── FaceEditor2D.tsx   # Interactive 2D canvas editor
-│   │   │   ├── LayerToolbar.tsx   # Add Text, Add Logo, Align tools
-│   │   │   ├── LayerList.tsx      # Layer reordering, opacity, delete
-│   │   │   └── TextControls.tsx   # Fonts, sizes, color picker
+│   │   │   └── FaceEditor2D.tsx   # Interactive 2D canvas, layers, text, logos & transforms
 │   │   ├── ui/
 │   │   │   ├── SectionTabs.tsx    # 8 printable zone selector tabs
 │   │   │   ├── VariantPicker.tsx  # 5x5, 6.5x6.5, 8x8 size switcher
-│   │   │   ├── HardwareSelector.tsx # Frame tier & accessories
-│   │   │   ├── PriceDrawer.tsx    # Live dynamic price breakdown
-│   │   │   └── CartModal.tsx      # Shopify payload inspector & verification
+│   │   │   ├── ColorPicker.tsx    # Palette swatches & react-colorful custom picker
+│   │   │   ├── HardwareSelector.tsx # Frame tiers & accessory options
+│   │   │   ├── PriceActionBar.tsx # Live subtotal, dynamic price breakdown drawer & actions
+│   │   │   ├── ShopifyPayloadModal.tsx # Shopify /cart/add.js payload inspector
+│   │   │   └── ThemeToggle.tsx    # Light/Dark DaisyUI theme toggle
 │   │   └── embed/
-│   │       └── ShopifyMockWrapper.tsx # Parent Shopify store mockup with iframe
+│   │       └── ShopifyHostMock.tsx # Host Shopify PDP simulation with iframe communication
 │   ├── config/
 │   │   └── tentProduct.ts         # Product definition, UV zones & camera targets
+│   ├── pages/
+│   │   ├── ConfiguratorPage.tsx   # Main standalone configurator view
+│   │   ├── ShopifyStorePage.tsx   # Mock parent Shopify PDP embedding iframe
+│   │   └── NotFoundPage.tsx       # 404 handler
 │   ├── services/
 │   │   ├── pricingService.ts      # Mock dynamic pricing microservice API
 │   │   ├── shopifyService.ts      # Shopify Cart API & postMessage bridge
 │   │   └── pdfService.ts          # jsPDF production spec sheet generator
 │   ├── store/
-│   │   └── configuratorStore.ts   # Central configuration state
+│   │   ├── useConfiguratorStore.ts # Central product, variant & customization state
+│   │   ├── useThemeStore.ts       # DaisyUI light/dark theme persistence
+│   │   └── useCanvasStore.ts      # Active 2D/3D interaction state
 │   ├── types/
-│   │   └── configurator.ts        # TypeScript interfaces & domain schemas
+│   │   └── configurator.ts        # Domain types & schema definitions
+│   ├── utils/
+│   │   ├── textureAtlas.ts        # Master 2048x2048 texture atlas composite engine
+│   │   └── assetPaths.ts          # Base URL & model asset resolution
 │   ├── App.tsx
 │   └── main.tsx
 └── README.md
@@ -422,10 +436,10 @@ npm run preview
 
 | Evaluation Criteria | Where to Find in Codebase |
 |---|---|
-| **Code Quality & Architecture** | Modular domain services in `src/services/`, clean separation of 2D/3D logic, typed interfaces in `src/types/configurator.ts` |
-| **2D/3D Synchronization** | `src/components/3d/TentModel.tsx` (CanvasTexture atlas) & `src/components/2d/FaceEditor2D.tsx` |
-| **Dynamic Pricing Logic** | `src/services/pricingService.ts` & `src/components/ui/PriceDrawer.tsx` |
-| **Shopify Integration** | `src/services/shopifyService.ts` & `src/components/ui/CartModal.tsx` (`/cart/add.js` payload) |
-| **Iframe Embeddability** | `src/components/embed/ShopifyMockWrapper.tsx` (`postMessage` communication bridge) |
-| **Production PDF Summary** | `src/services/pdfService.ts` (Multi-angle 3D captures + 2D flat unwrap + BOM) |
+| **Code Quality & Architecture** | Modular domain services in `src/services/`, clean separation of 2D/3D logic, typed schemas with TypeScript `type` in `src/types/configurator.ts` |
+| **2D/3D Synchronization** | `src/utils/textureAtlas.ts`, `src/components/3d/Canvas3D.tsx` & `src/components/2d/FaceEditor2D.tsx` |
+| **Dynamic Pricing Logic** | `src/services/pricingService.ts` & `src/components/ui/PriceActionBar.tsx` |
+| **Shopify Integration** | `src/services/shopifyService.ts` & `src/components/ui/ShopifyPayloadModal.tsx` (`/cart/add.js` payload) |
+| **Iframe Embeddability** | `src/components/embed/ShopifyHostMock.tsx` & `src/pages/ShopifyStorePage.tsx` (`postMessage` communication bridge) |
+| **Production PDF Summary** | `src/services/pdfService.ts` (Multi-angle 3D captures + BOM + print specifications) |
 | **Reusability** | Declarative product registry in `src/config/tentProduct.ts` |
