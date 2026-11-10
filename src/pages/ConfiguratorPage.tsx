@@ -163,7 +163,7 @@ export function ConfiguratorPage({ isEmbed = false }: ConfiguratorPageProps) {
       )}
 
       {/* main studio viewport split layout threed left controls right */}
-      <div className="flex-1 flex flex-col lg:flex-row overflow-hidden overflow-x-hidden relative w-full">
+      <main id="main-content" tabIndex={-1} className="flex-1 flex flex-col lg:flex-row overflow-hidden overflow-x-hidden relative w-full outline-none">
         {/* threed webgl canvas container */}
         <div className="flex-1 relative bg-base-300/40 overflow-hidden h-1/2 lg:h-full">
           <Canvas3D />
@@ -256,7 +256,7 @@ export function ConfiguratorPage({ isEmbed = false }: ConfiguratorPageProps) {
             )}
           </div>
         </div>
-      </div>
+      </main>
 
       {/* sticky bottom pricing and action bar */}
       <PriceActionBar

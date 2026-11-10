@@ -24,6 +24,10 @@ A high-performance, modular **3D & 2D Product Configurator** built with **React*
 
 ## 🌟 Overview & Live Demo
 
+🔗 **Live Application URL:** [https://canopy-config.vercel.app/](https://canopy-config.vercel.app/)  
+🛍️ **Shopify Storefront Mock:** [https://canopy-config.vercel.app/shopify-preview](https://canopy-config.vercel.app/shopify-preview)  
+🖼️ **Embed Route (Iframe-Ready):** [https://canopy-config.vercel.app/embed](https://canopy-config.vercel.app/embed)  
+
 Customizable outdoor canopy tents require intricate branding across multiple printable zones: **4 roof peaks** and **4 valance skirts**, along with hardware choices (frame materials, sandbags, roller bags) and size variants (5'x5', 6.5'x6.5', 8'x8', 10'x10').
 
 This application solves the core engineering challenges of interactive 3D commerce:

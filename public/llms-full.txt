@@ -1,0 +1,62 @@
+# Canopy Tent 3D Configurator — Full System Specification
+
+> Complete technical documentation for the interactive 3D and 2D canopy tent configurator.
+
+## Overview
+This application is a modular, schema-driven 3D product configurator inspired by MVP Visuals commercial canopy tents. It solves the core engineering challenges of interactive 3D commerce by unifying real-time 2D graphic editing with WebGL canvas rendering, dynamic pricing microservices, and automated production PDF generation.
+
+## URLs & Routing
+- Production Origin: `https://canopy-config.vercel.app/`
+- `/` — Standalone full-featured configurator view.
+- `/embed` — Isolated, headerless configurator view configured for secure cross-origin iframe embedding.
+- `/shopify-preview` — Mock Shopify product detail page (PDP) demonstrating parent-to-iframe communication via `window.postMessage`.
+
+## Product Variants & Pricing
+- `tent-5x5`: 5' x 5' Compact Tent ($429.00 base)
+- `tent-6.5x6.5`: 6.5' x 6.5' Mid-Size Tent ($499.00 base)
+- `tent-8x8`: 8' x 8' Commercial Tent ($549.00 base)
+
+## Hardware Tiers & Add-ons
+- Standard Steel Frame (Included)
+- Commercial 40mm Hex Aluminum Frame (+$90.00)
+- Heavy Sandbag Weights Set of 4 (+$45.00)
+- Heavy-Duty Roller Carry Bag (+$55.00)
+
+## Printable Zones & UV Texture Atlas
+The model features 8 independently customizable print zones:
+1. `front_peak` (Rotation: 0°)
+2. `front_valance` (Rotation: 0°)
+3. `right_peak` (Rotation: -90°)
+4. `right_valance` (Rotation: -90°)
+5. `back_peak` (Rotation: 180°)
+6. `back_valance` (Rotation: 180°)
+7. `left_peak` (Rotation: 90°)
+8. `left_valance` (Rotation: 90°)
+
+All 8 zones are dynamically composited onto a single 2048x2048 master canvas. Changes to text, colors, or uploaded logos are rendered to the master texture and uploaded to the GPU via `THREE.CanvasTexture` throttled to `requestAnimationFrame`.
+
+## Shopify Handoff Protocol
+When adding to cart, the configurator transmits a structured payload to the host parent window:
+```json
+{
+  "type": "SHOPIFY_ADD_TO_CART",
+  "payload": {
+    "items": [
+      {
+        "id": 48192019482012,
+        "quantity": 1,
+        "properties": {
+          "_config_id": "...",
+          "_pdf_summary_url": "...",
+          "_render_preview": "...",
+          "Size": "8' x 8' Custom Tent",
+          "Frame": "Commercial 40mm Hex Aluminum",
+          "Fabric Color": "Navy Blue (#1E3A8A)",
+          "Custom Print Locations": "Front Peak (1 section)",
+          "Accessories": "Sandbag Weights (Set of 4)"
+        }
+      }
+    ]
+  }
+}
+```

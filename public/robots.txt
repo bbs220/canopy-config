@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://canopy-config.vercel.app/sitemap.xml

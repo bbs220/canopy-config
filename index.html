@@ -2,9 +2,96 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/canopy.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Canopy Config</title>
+    <title>Interactive 3D Canopy Tent Configurator | MVP Visuals Replica</title>
+    <meta
+      name="description"
+      content="Custom 3D canopy tent configurator with real-time 2D/3D texture synchronization, dynamic pricing, Shopify cart integration, and production-ready PDF proof export."
+    />
+    <link rel="canonical" href="https://canopy-config.vercel.app/" />
+    <meta name="robots" content="index, follow" />
+    <meta name="color-scheme" content="light dark" />
+    <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#18181b" media="(prefers-color-scheme: dark)" />
+
+    <link rel="icon" type="image/png" href="/canopy.png" />
+    <link rel="apple-touch-icon" href="/canopy.png" />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Canopy Configurator" />
+    <meta property="og:url" content="https://canopy-config.vercel.app/" />
+    <meta property="og:title" content="Interactive 3D Canopy Tent Configurator" />
+    <meta
+      property="og:description"
+      content="Design and customize 10x10 canopy tents with real-time 3D preview, dynamic pricing, and production PDF export."
+    />
+    <meta property="og:image" content="https://canopy-config.vercel.app/thumbnail_1200x630.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="Interactive 3D Canopy Tent Configurator Preview" />
+
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:url" content="https://canopy-config.vercel.app/" />
+    <meta name="twitter:title" content="Interactive 3D Canopy Tent Configurator" />
+    <meta
+      name="twitter:description"
+      content="Design and customize 10x10 canopy tents with real-time 3D preview, dynamic pricing, and production PDF export."
+    />
+    <meta name="twitter:image" content="https://canopy-config.vercel.app/thumbnail_1200x630.png" />
+
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@graph": [
+          {
+            "@type": "Product",
+            "@id": "https://canopy-config.vercel.app/#product",
+            "name": "Custom Commercial Canopy Tent",
+            "description": "High-performance commercial outdoor canopy tent featuring 8 customizable dye-sublimation print zones, heavy-duty aluminum hardware, and lifetime frame warranty.",
+            "image": "https://canopy-config.vercel.app/thumbnail_1200x630.png",
+            "brand": {
+              "@type": "Brand",
+              "name": "MVP Visuals Replica"
+            },
+            "offers": [
+              {
+                "@type": "Offer",
+                "name": "5' x 5' Compact Tent",
+                "price": "429.00",
+                "priceCurrency": "USD",
+                "availability": "https://schema.org/InStock",
+                "url": "https://canopy-config.vercel.app/"
+              },
+              {
+                "@type": "Offer",
+                "name": "6.5' x 6.5' Mid-Size Tent",
+                "price": "499.00",
+                "priceCurrency": "USD",
+                "availability": "https://schema.org/InStock",
+                "url": "https://canopy-config.vercel.app/"
+              },
+              {
+                "@type": "Offer",
+                "name": "8' x 8' Commercial Tent",
+                "price": "549.00",
+                "priceCurrency": "USD",
+                "availability": "https://schema.org/InStock",
+                "url": "https://canopy-config.vercel.app/"
+              }
+            ]
+          },
+          {
+            "@type": "WebApplication",
+            "@id": "https://canopy-config.vercel.app/#app",
+            "name": "Canopy Tent 3D Configurator",
+            "url": "https://canopy-config.vercel.app/",
+            "applicationCategory": "DesignApplication",
+            "operatingSystem": "All",
+            "browserRequirements": "Requires WebGL support"
+          }
+        ]
+      }
+    </script>
   </head>
   <body>
     <div id="root"></div>

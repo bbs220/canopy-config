@@ -28,6 +28,23 @@
       Cantarell,
       sans-serif;
   }
+
+  html {
+    scrollbar-gutter: stable;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    text-wrap: balance;
+  }
+
+  p {
+    text-wrap: pretty;
+  }
 }
 
 /* tweakpane overrides (width, positioning, and scroll limits) */

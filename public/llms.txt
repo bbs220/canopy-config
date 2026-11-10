@@ -1,0 +1,15 @@
+# Canopy Tent 3D Configurator
+
+> An interactive 3D and 2D product configurator for commercial outdoor canopy tents, featuring real-time texture synchronization, dynamic pricing, Shopify Cart integration, and automated production PDF proof export.
+
+## Main Pages
+- [Interactive Configurator](https://canopy-config.vercel.app/): Main 3D viewport and 2D graphic customization suite.
+- [Shopify PDP Integration Preview](https://canopy-config.vercel.app/shopify-preview): Host storefront demonstration showing iframe embedding and bi-directional postMessage cart handoff.
+- [Embeddable Configurator View](https://canopy-config.vercel.app/embed): Isolated configurator view designed for third-party iframe integration.
+
+## Technical Architecture
+- **Framework:** React 19, TypeScript, Three.js, React Three Fiber, Tailwind CSS, DaisyUI.
+- **UV Texture Atlas:** Master 2048x2048 canvas atlas compositing 8 printable zones with quadrant rotation matrices and triangular peak clipping.
+- **Dynamic Pricing API:** Decoupled asynchronous pricing service with real-time bill of materials itemization.
+- **E-Commerce Handoff:** Standard Shopify line-item properties (`_config_id`, `_pdf_summary_url`, `_render_preview`, `Customization Summary`).
+- **Production Export:** High-resolution multi-angle WebGL rendering compiled directly into vector/raster PDF proofs via jsPDF.
