@@ -3,6 +3,7 @@ import * as THREE from "three";
 import { Canvas } from "@react-three/fiber";
 import {
   ContactShadows,
+  Environment,
   GizmoHelper,
   GizmoViewport,
   StatsGl,
@@ -144,43 +145,33 @@ const Floor = () => {
 export const PrimaryScene = () => {
   const { theme } = useThemeStore();
 
-  const {
-    showFPS,
-    showGizmo,
-    ambientIntensity,
-    sunIntensity,
-    autoRotateSpeed,
-  } = useTweakpane("3D Studio", {
-    ambientIntensity: {
-      value: 1.4,
-      min: 0.1,
-      max: 3.0,
-      step: 0.1,
-      label: "ambient light",
+  const { showFPS, showGizmo, sunIntensity, autoRotateSpeed } = useTweakpane(
+    "3D Studio",
+    {
+      sunIntensity: {
+        value: 2.2,
+        min: 0.1,
+        max: 5.0,
+        step: 0.1,
+        label: "sun light",
+      },
+      autoRotateSpeed: {
+        value: 1.5,
+        min: 0.1,
+        max: 6.0,
+        step: 0.2,
+        label: "auto rotate speed",
+      },
+      showGizmo: {
+        value: false,
+        label: "show gizmo",
+      },
+      showFPS: {
+        value: false,
+        label: "show fps",
+      },
     },
-    sunIntensity: {
-      value: 2.2,
-      min: 0.1,
-      max: 5.0,
-      step: 0.1,
-      label: "sun light",
-    },
-    autoRotateSpeed: {
-      value: 1.5,
-      min: 0.1,
-      max: 6.0,
-      step: 0.2,
-      label: "auto rotate speed",
-    },
-    showGizmo: {
-      value: false,
-      label: "show gizmo",
-    },
-    showFPS: {
-      value: false,
-      label: "show fps",
-    },
-  });
+  );
 
   const isDark = theme === "dark";
   const bgColor = isDark ? "#1d232a" : "#f3f4f6";
@@ -198,9 +189,8 @@ export const PrimaryScene = () => {
         />
         {/* dynamic theme background color */}
         <color attach="background" args={[bgColor]} />
+        <Environment preset="city" />
 
-        {/* studio lighting */}
-        <ambientLight intensity={ambientIntensity} />
         <directionalLight
           position={[4, 7, 5]}
           intensity={sunIntensity}
