@@ -1,4 +1,4 @@
-import type { CustomizationLayer, SectionCustomization, PrintableSection } from '../types/configurator';
+import type { CustomizationLayer, SectionCustomization, PrintableSection, SectionCategory } from '../types/configurator';
 
 export const MASTER_TEXTURE_SIZE = 2048;
 
@@ -48,13 +48,24 @@ export class TextureAtlasEngine {
     customization: SectionCustomization,
     baseColor: string,
     width = 1024,
-    height = 1024
+    height = 1024,
+    category?: SectionCategory
   ): HTMLCanvasElement {
     const canvas = document.createElement('canvas');
     canvas.width = width;
     canvas.height = height;
     const ctx = canvas.getContext('2d');
     if (!ctx) return canvas;
+
+    // clip peak sections to triangular printable boundary
+    if (category === 'peak') {
+      ctx.beginPath();
+      ctx.moveTo(width * 0.5, 0);
+      ctx.lineTo(width, height);
+      ctx.lineTo(0, height);
+      ctx.closePath();
+      ctx.clip();
+    }
 
     // background color
     ctx.fillStyle = customization.backgroundColor || baseColor;
@@ -160,13 +171,28 @@ export class TextureAtlasEngine {
       // render section to a virtual high res buffer
       const sectionWidth = Math.max(64, Math.round(destW * 2));
       const sectionHeight = Math.max(64, Math.round(destH * 2));
-      const sectionCanvas = this.renderSectionToCanvas(customData, baseColor, sectionWidth, sectionHeight);
+      const sectionCanvas = this.renderSectionToCanvas(
+        customData,
+        baseColor,
+        sectionWidth,
+        sectionHeight,
+        section.category
+      );
 
       // blit section canvas into atlas
       ctx.save();
       ctx.translate(centerX, centerY);
       if (rotationRad !== 0) {
         ctx.rotate(rotationRad);
+      }
+      // clip destination to triangular peak boundary
+      if (section.category === 'peak') {
+        ctx.beginPath();
+        ctx.moveTo(0, -destH / 2);
+        ctx.lineTo(destW / 2, destH / 2);
+        ctx.lineTo(-destW / 2, destH / 2);
+        ctx.closePath();
+        ctx.clip();
       }
       ctx.drawImage(sectionCanvas, -destW / 2, -destH / 2, destW, destH);
       ctx.restore();
