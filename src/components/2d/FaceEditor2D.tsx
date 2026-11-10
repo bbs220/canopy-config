@@ -15,7 +15,9 @@ import {
   Sparkles,
   Check,
   Pencil,
+  Pipette,
 } from 'lucide-react';
+import { HexColorPicker } from 'react-colorful';
 import toast from 'react-hot-toast';
 
 type FaceEditor2DProps = {
@@ -43,11 +45,18 @@ export const FaceEditor2D: React.FC<FaceEditor2DProps> = ({
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [selectedLayerId, setSelectedLayerId] = useState<string | null>(null);
+  const [isColorPickerOpen, setIsColorPickerOpen] = useState<boolean>(false);
   const [isDragging, setIsDragging] = useState<boolean>(false);
   const [dragStart, setDragStart] = useState<{ x: number; y: number } | null>(null);
 
   const layers = useMemo(() => customization.layers || [], [customization.layers]);
   const selectedLayer = layers.find((l) => l.id === selectedLayerId);
+
+  const currentTextColor =
+    selectedLayer?.type === 'text'
+      ? (selectedLayer as TextLayer).color ||
+        (section.id === 'front_peak' || section.category === 'peak' ? '#000000' : '#FFFFFF')
+      : '#000000';
 
   // canvas dimensions matching section aspect ratio
   const canvasWidth = section.category === 'valance' ? 700 : 420;
@@ -92,7 +101,8 @@ export const FaceEditor2D: React.FC<FaceEditor2DProps> = ({
         const weight = layer.isBold ? 'bold' : 'normal';
         const style = layer.isItalic ? 'italic' : 'normal';
         ctx.font = `${style} ${weight} ${fontSize}px ${layer.fontFamily || 'Inter, sans-serif'}`;
-        ctx.fillStyle = layer.color || '#FFFFFF';
+        const defaultTextColor = section.id === 'front_peak' || section.category === 'peak' ? '#000000' : '#FFFFFF';
+        ctx.fillStyle = layer.color || defaultTextColor;
         ctx.textAlign = layer.align || 'center';
         ctx.textBaseline = 'middle';
         ctx.fillText(layer.text, 0, 0);
@@ -212,13 +222,14 @@ export const FaceEditor2D: React.FC<FaceEditor2DProps> = ({
 
   // add new text layer
   const handleAddText = () => {
+    const defaultColor = section.id === 'front_peak' || section.category === 'peak' ? '#000000' : '#FFFFFF';
     const newText: TextLayer = {
       id: 'txt_' + Math.random().toString(36).substring(2, 7),
       type: 'text',
       text: 'YOUR BRAND',
       fontFamily: 'Inter, sans-serif',
       fontSize: section.category === 'valance' ? 40 : 18,
-      color: '#FFFFFF',
+      color: defaultColor,
       x: 50,
       y: 50,
       scale: 1,
@@ -482,17 +493,53 @@ export const FaceEditor2D: React.FC<FaceEditor2DProps> = ({
 
                 <div>
                   <label className="text-[10px] font-bold text-base-content/60 uppercase">Text Color</label>
-                  <div className="flex items-center gap-2 mt-1">
-                    <input
-                      type="color"
-                      value={(selectedLayer as TextLayer).color}
-                      onChange={(e) => updateSelectedLayer({ color: e.target.value })}
-                      className="w-8 h-8 rounded border border-base-300 cursor-pointer"
-                    />
-                    <span className="text-xs font-mono">{(selectedLayer as TextLayer).color}</span>
-                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setIsColorPickerOpen((prev) => !prev)}
+                    className="flex items-center justify-between w-full h-8 mt-1 px-2.5 rounded-lg border border-base-300 bg-base-100 hover:border-primary/50 transition-all cursor-pointer"
+                  >
+                    <div className="flex items-center gap-2 min-w-0">
+                      <div
+                        className="w-4 h-4 rounded-full border border-black/20 shadow-xs shrink-0"
+                        style={{ backgroundColor: currentTextColor }}
+                      />
+                      <span className="text-xs font-mono font-bold uppercase truncate">
+                        {currentTextColor}
+                      </span>
+                    </div>
+                    <Pipette className="w-3.5 h-3.5 text-base-content/60 shrink-0" />
+                  </button>
                 </div>
               </div>
+
+              {/* text color picker panel */}
+              {isColorPickerOpen && (
+                <div className="p-3 rounded-xl border border-base-300 bg-base-200/60 flex flex-col items-center gap-2.5 transition-all">
+                  <div className="w-full flex justify-center">
+                    <HexColorPicker
+                      color={currentTextColor}
+                      onChange={(hex) => updateSelectedLayer({ color: hex })}
+                      style={{ width: '100%', maxWidth: '100%', height: '140px' }}
+                    />
+                  </div>
+                  <div className="w-full flex items-center justify-between gap-1 pt-2 border-t border-base-300">
+                    {['#000000', '#FFFFFF', '#2563EB', '#DC2626', '#16A34A', '#F59E0B', '#9333EA'].map((preset) => (
+                      <button
+                        key={preset}
+                        type="button"
+                        onClick={() => updateSelectedLayer({ color: preset })}
+                        className={`w-5 h-5 rounded-full border border-black/20 shadow-xs transition-transform hover:scale-110 cursor-pointer ${
+                          currentTextColor.toLowerCase() === preset.toLowerCase()
+                            ? 'ring-2 ring-primary ring-offset-1'
+                            : ''
+                        }`}
+                        style={{ backgroundColor: preset }}
+                        title={preset}
+                      />
+                    ))}
+                  </div>
+                </div>
+              )}
 
               {/* text formatting shortcuts */}
               <div className="flex items-center gap-1 pt-1">

@@ -90,7 +90,7 @@ export class TextureAtlasEngine {
       const weight = layer.isBold ? 'bold' : 'normal';
       const style = layer.isItalic ? 'italic' : 'normal';
       ctx.font = `${style} ${weight} ${fontSize}px ${layer.fontFamily || 'Inter, sans-serif'}`;
-      ctx.fillStyle = layer.color || '#FFFFFF';
+      ctx.fillStyle = layer.color || '#000000';
       ctx.textAlign = layer.align || 'center';
       ctx.textBaseline = 'middle';
       ctx.fillText(layer.text, 0, 0);
