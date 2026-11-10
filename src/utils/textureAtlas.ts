@@ -144,22 +144,32 @@ export class TextureAtlasEngine {
       }
 
       const { uMin, uMax, vMin, vMax } = section.uvRegion;
+      const isRotated90 = section.rotation === 90 || section.rotation === -90 || section.rotation === 270;
+
+      // destination dimensions in uv space
+      const destW = (isRotated90 ? (vMax - vMin) : (uMax - uMin)) * MASTER_TEXTURE_SIZE;
+      const destH = (isRotated90 ? (uMax - uMin) : (vMax - vMin)) * MASTER_TEXTURE_SIZE;
 
       // in threejs with flip y false canvas coords match uv
       // x equals u times width
       // y equals v times height
-      const targetX = uMin * MASTER_TEXTURE_SIZE;
-      const targetY = vMin * MASTER_TEXTURE_SIZE;
-      const targetW = (uMax - uMin) * MASTER_TEXTURE_SIZE;
-      const targetH = (vMax - vMin) * MASTER_TEXTURE_SIZE;
+      const centerX = ((uMin + uMax) / 2) * MASTER_TEXTURE_SIZE;
+      const centerY = ((vMin + vMax) / 2) * MASTER_TEXTURE_SIZE;
+      const rotationRad = ((section.rotation || 0) * Math.PI) / 180;
 
       // render section to a virtual high res buffer
-      const sectionWidth = Math.max(64, Math.round(targetW * 2));
-      const sectionHeight = Math.max(64, Math.round(targetH * 2));
+      const sectionWidth = Math.max(64, Math.round(destW * 2));
+      const sectionHeight = Math.max(64, Math.round(destH * 2));
       const sectionCanvas = this.renderSectionToCanvas(customData, baseColor, sectionWidth, sectionHeight);
 
       // blit section canvas into atlas
-      ctx.drawImage(sectionCanvas, targetX, targetY, targetW, targetH);
+      ctx.save();
+      ctx.translate(centerX, centerY);
+      if (rotationRad !== 0) {
+        ctx.rotate(rotationRad);
+      }
+      ctx.drawImage(sectionCanvas, -destW / 2, -destH / 2, destW, destH);
+      ctx.restore();
     }
 
     return this.masterCanvas;

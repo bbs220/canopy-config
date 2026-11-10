@@ -60,7 +60,7 @@ export const FaceEditor2D: React.FC<FaceEditor2DProps> = ({
   // canvas dimensions matching section aspect ratio
   const canvasWidth = section.category === 'valance' ? 700 : 420;
   const canvasHeight = Math.round(
-    canvasWidth / (section.aspectRatio || (section.category === 'valance' ? 5.9 : 1.4))
+    canvasWidth / (section.aspectRatio || (section.category === 'valance' ? 5.65 : 1.48))
   );
 
   // render twod canvas

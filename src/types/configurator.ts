@@ -20,6 +20,7 @@ export type PrintableSection = {
   uvRegion: UVRegion;
   // width divided by height for twod editor canvas
   aspectRatio: number;
+  rotation?: number;
   cameraView: CameraViewConfig;
   printCost: number;
 };
