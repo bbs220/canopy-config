@@ -6,6 +6,8 @@ export const MASTER_TEXTURE_SIZE = 2048;
 export class TextureAtlasEngine {
   private masterCanvas: HTMLCanvasElement;
   private ctx: CanvasRenderingContext2D;
+  private scratchCanvas: HTMLCanvasElement;
+  private scratchCtx: CanvasRenderingContext2D;
   private loadedImages: Map<string, HTMLImageElement> = new Map();
 
   constructor() {
@@ -15,6 +17,13 @@ export class TextureAtlasEngine {
     const context = this.masterCanvas.getContext('2d');
     if (!context) throw new Error('Failed to create master canvas 2d context');
     this.ctx = context;
+
+    this.scratchCanvas = document.createElement('canvas');
+    this.scratchCanvas.width = 1024;
+    this.scratchCanvas.height = 1024;
+    const scratchContext = this.scratchCanvas.getContext('2d');
+    if (!scratchContext) throw new Error('Failed to create scratch canvas 2d context');
+    this.scratchCtx = scratchContext;
 
     // fill with default white
     this.ctx.fillStyle = '#FFFFFF';
@@ -51,11 +60,15 @@ export class TextureAtlasEngine {
     height = 1024,
     category?: SectionCategory
   ): HTMLCanvasElement {
-    const canvas = document.createElement('canvas');
-    canvas.width = width;
-    canvas.height = height;
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return canvas;
+    const canvas = this.scratchCanvas;
+    if (canvas.width !== width || canvas.height !== height) {
+      canvas.width = width;
+      canvas.height = height;
+    }
+    const ctx = this.scratchCtx;
+    ctx.restore();
+    ctx.save();
+    ctx.clearRect(0, 0, width, height);
 
     // clip peak sections to triangular printable boundary
     if (category === 'peak') {

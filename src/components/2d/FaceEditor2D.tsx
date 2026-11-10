@@ -344,10 +344,14 @@ export const FaceEditor2D: React.FC<FaceEditor2DProps> = ({
     const currentX = ((e.clientX - rect.left) / rect.width) * 100;
     const currentY = ((e.clientY - rect.top) / rect.height) * 100;
 
-    const newX = Math.max(5, Math.min(95, currentX - dragStart.x));
-    const newY = Math.max(5, Math.min(95, currentY - dragStart.y));
+    const nextX = Math.round(Math.max(5, Math.min(95, currentX - dragStart.x)));
+    const nextY = Math.round(Math.max(5, Math.min(95, currentY - dragStart.y)));
 
-    updateSelectedLayer({ x: Math.round(newX), y: Math.round(newY) });
+    if (nextX === selectedLayer.x && nextY === selectedLayer.y) {
+      return;
+    }
+
+    updateSelectedLayer({ x: nextX, y: nextY });
   };
 
   const handleCanvasMouseUp = () => {

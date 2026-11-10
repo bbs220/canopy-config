@@ -96,13 +96,22 @@ export const useConfiguratorStore = create<ConfiguratorState>((set, get) => ({
   },
 
   updateSectionCustomization: (sectionId: string, customization: SectionCustomization) => {
+    const prevSections = get().sections;
+    const prevCustom = prevSections[sectionId];
+    const prevLayersCount = prevCustom?.layers?.length || 0;
+    const nextLayersCount = customization?.layers?.length || 0;
+
     set((state) => ({
       sections: {
         ...state.sections,
         [sectionId]: customization,
       },
     }));
-    get().calculatePricing();
+
+    // recalculate pricing only when layer count changes
+    if (prevLayersCount !== nextLayersCount) {
+      get().calculatePricing();
+    }
   },
 
   resetSection: (sectionId: string) => {

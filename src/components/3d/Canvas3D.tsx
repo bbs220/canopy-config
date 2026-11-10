@@ -81,34 +81,38 @@ const ProductModelLoader = () => {
   // update canvas texture on fabric material
   useEffect(() => {
     let isCancelled = false;
-    atlasEngineRef.current
-      .bakeAtlas(product.sections, sections, baseColor)
-      .then((atlasCanvas) => {
-        if (isCancelled) return;
-        if (!canvasTextureRef.current) {
-          const texture = new THREE.CanvasTexture(atlasCanvas);
-          texture.colorSpace = THREE.SRGBColorSpace;
-          texture.flipY = false;
-          texture.generateMipmaps = true;
-          texture.minFilter = THREE.LinearMipmapLinearFilter;
-          texture.magFilter = THREE.LinearFilter;
-          canvasTextureRef.current = texture;
-        } else {
-          canvasTextureRef.current.image = atlasCanvas;
-          canvasTextureRef.current.needsUpdate = true;
-        }
 
-        if (fabricMaterialRef.current) {
-          fabricMaterialRef.current.map = canvasTextureRef.current;
-          fabricMaterialRef.current.needsUpdate = true;
-        }
-      })
-      .catch((err) => {
-        console.error("texture bake failed", err);
-      });
+    const animFrameId = requestAnimationFrame(() => {
+      atlasEngineRef.current
+        .bakeAtlas(product.sections, sections, baseColor)
+        .then((atlasCanvas) => {
+          if (isCancelled) return;
+          if (!canvasTextureRef.current) {
+            const texture = new THREE.CanvasTexture(atlasCanvas);
+            texture.colorSpace = THREE.SRGBColorSpace;
+            texture.flipY = false;
+            texture.generateMipmaps = false;
+            texture.minFilter = THREE.LinearFilter;
+            texture.magFilter = THREE.LinearFilter;
+            canvasTextureRef.current = texture;
+          } else {
+            canvasTextureRef.current.image = atlasCanvas;
+            canvasTextureRef.current.needsUpdate = true;
+          }
+
+          if (fabricMaterialRef.current) {
+            fabricMaterialRef.current.map = canvasTextureRef.current;
+            fabricMaterialRef.current.needsUpdate = true;
+          }
+        })
+        .catch((err) => {
+          console.error("texture bake failed", err);
+        });
+    });
 
     return () => {
       isCancelled = true;
+      cancelAnimationFrame(animFrameId);
     };
   }, [sections, baseColor, product.sections]);
 
